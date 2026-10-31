@@ -31,12 +31,7 @@ class ProtectWebhookListener {
         port,
         shared: true,
       );
-      _server!.listen(
-        _handleRequest,
-        onError: (Object error) {
-          // Keep stream intact on underlying socket errors
-        },
-      );
+      _server!.listen(_handleRequest);
       return true;
     } catch (_) {
       _server = null;

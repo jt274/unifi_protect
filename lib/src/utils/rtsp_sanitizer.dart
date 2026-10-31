@@ -7,6 +7,8 @@
 class RtspSanitizer {
   const RtspSanitizer._();
 
+  static const RtspSanitizer instance = RtspSanitizer._();
+
   /// Converts a UniFi `rtsps://...:7441/...?enableSrtp` URL to `rtsp://...:7447/...`
   /// while preserving credentials, host, path, and any non-SRTP query parameters.
   static String sanitize(String rawUrl) {

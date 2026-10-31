@@ -66,16 +66,15 @@ class ProtectEventSubscription {
       _channel = IOWebSocketChannel(socket);
       _setConnected(true);
 
+      void onDisconnected([Object? _]) {
+        _setConnected(false);
+        _scheduleReconnect();
+      }
+
       _subscription = _channel!.stream.listen(
         _handleMessage,
-        onError: (Object error) {
-          _setConnected(false);
-          _scheduleReconnect();
-        },
-        onDone: () {
-          _setConnected(false);
-          _scheduleReconnect();
-        },
+        onError: onDisconnected,
+        onDone: onDisconnected,
       );
       return true;
     } catch (_) {
