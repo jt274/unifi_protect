@@ -10,8 +10,6 @@
         <img src="https://img.shields.io/badge/Donate-PayPal-00457C?logo=paypal" alt="Donate" />
     </a>
 </p>
-# UniFi Protect Dart Client (`unifi_protect`)
-
 A comprehensive, pure Dart client for the official Ubiquiti **UniFi Protect Integration API (v1)** (`developer.ui.com/protect`).
 
 Supports cameras, smart floodlights, multi-sensors, doorbells & chimes, ViewPort viewers, live views, NVR system status, Alarm Manager webhooks, and real-time WebSocket event streaming.
