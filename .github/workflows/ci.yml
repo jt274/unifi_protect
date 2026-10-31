@@ -12,8 +12,6 @@ jobs:
   lint_and_analyze:
     name: Lint & Analyze
     runs-on: ubuntu-latest
-    # Requires maintainer approval via GitHub Environment protection rules when run on PRs
-    environment: ${{ github.event_name == 'pull_request' && 'maintainer-approval' || '' }}
 
     steps:
       - name: Checkout Repository

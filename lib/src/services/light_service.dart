@@ -8,12 +8,16 @@ import '../models/light.dart';
 
 /// Service for managing UniFi Protect smart floodlights.
 class LightService {
+  /// Creates a [LightService] with the given [options] and HTTP [client].
   LightService({
     required this.options,
     required this.client,
   });
 
+  /// The active UniFi Protect client connection options.
   final UnifiProtectOptions options;
+
+  /// The HTTP client used to perform API requests.
   final http.Client client;
 
   /// Lists all adopted floodlights.

@@ -2,6 +2,7 @@ import '../models/detection_type.dart';
 
 /// Base class for all real-time events emitted by UniFi Protect.
 abstract class ProtectEvent {
+  /// Creates a [ProtectEvent] with the given [timestamp] and [rawPayload].
   const ProtectEvent({
     required this.timestamp,
     required this.rawPayload,
@@ -16,6 +17,7 @@ abstract class ProtectEvent {
 
 /// Real-time motion or smart alert event associated with a specific camera.
 class ProtectAlertEvent extends ProtectEvent {
+  /// Creates a [ProtectAlertEvent] for the specified [cameraId] and [detectionType].
   const ProtectAlertEvent({
     required this.cameraId,
     required this.detectionType,
@@ -55,6 +57,7 @@ class ProtectAlertEvent extends ProtectEvent {
 
 /// Emitted when a device state updates (e.g. online/offline, settings modified).
 class ProtectDeviceUpdateEvent extends ProtectEvent {
+  /// Creates a [ProtectDeviceUpdateEvent].
   const ProtectDeviceUpdateEvent({
     required this.modelKey,
     required this.deviceId,
@@ -63,8 +66,13 @@ class ProtectDeviceUpdateEvent extends ProtectEvent {
     super.rawPayload = const <String, dynamic>{},
   });
 
+  /// The device model category (e.g. 'camera', 'light', 'sensor').
   final String modelKey;
+
+  /// The identifier of the updated device.
   final String deviceId;
+
+  /// The update action performed (e.g. 'update', 'delete').
   final String action;
 
   @override

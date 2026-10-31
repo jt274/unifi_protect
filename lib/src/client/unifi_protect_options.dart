@@ -1,5 +1,6 @@
 /// Configuration options for connecting to UniFi Protect.
 class UnifiProtectOptions {
+  /// Creates a immutable [UnifiProtectOptions] instance.
   const UnifiProtectOptions({
     this.host = '192.168.1.1',
     this.port = 443,

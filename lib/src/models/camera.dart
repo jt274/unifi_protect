@@ -4,6 +4,7 @@ import 'stream_quality.dart';
 
 /// Represents a UniFi Protect camera or doorbell device.
 class ProtectCamera {
+  /// Creates a [ProtectCamera] device representation.
   const ProtectCamera({
     required this.id,
     required this.name,
@@ -24,6 +25,7 @@ class ProtectCamera {
     this.rawJson = const <String, dynamic>{},
   });
 
+  /// Deserializes a [ProtectCamera] from JSON returned by the Protect API.
   factory ProtectCamera.fromJson(Map<String, dynamic> json) {
     final String id = json['id']?.toString() ?? '';
     final String name = json['name']?.toString() ?? 'UniFi Camera';
@@ -202,6 +204,7 @@ class ProtectCamera {
   CameraChannel? get packageChannel =>
       getChannelForQuality(StreamQuality.package);
 
+  /// Converts this camera instance into a JSON-serializable map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

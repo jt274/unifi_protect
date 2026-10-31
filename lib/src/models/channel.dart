@@ -2,6 +2,7 @@ import 'stream_quality.dart';
 
 /// Represents a video stream channel configured on a UniFi Protect camera.
 class CameraChannel {
+  /// Creates a [CameraChannel] definition.
   const CameraChannel({
     required this.id,
     required this.name,
@@ -13,6 +14,7 @@ class CameraChannel {
     this.bitrate,
   });
 
+  /// Deserializes a [CameraChannel] from JSON data.
   factory CameraChannel.fromJson(Map<String, dynamic> json) {
     final dynamic rawId = json['id'];
     final int id = rawId is num
@@ -106,6 +108,7 @@ class CameraChannel {
     }
   }
 
+  /// Converts this channel into a JSON-serializable map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

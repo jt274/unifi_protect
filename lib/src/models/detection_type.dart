@@ -1,15 +1,33 @@
 /// Supported smart and motion detection types from UniFi Protect.
 enum ProtectDetectionType {
+  /// General video motion detection.
   motion,
+
+  /// Person smart detection.
   person,
+
+  /// Vehicle smart detection.
   vehicle,
+
+  /// Package smart detection.
   package,
+
+  /// Animal smart detection.
   animal,
+
+  /// Doorbell physical ring event.
   ring,
+
+  /// Smoke detector audio alarm detection.
   smoke,
+
+  /// Carbon monoxide detector audio alarm detection.
   cmonoxide,
+
+  /// Siren audio alarm detection.
   siren;
 
+  /// User-friendly display name for this detection type.
   String get displayName {
     switch (this) {
       case ProtectDetectionType.motion:
@@ -33,6 +51,7 @@ enum ProtectDetectionType {
     }
   }
 
+  /// Parses a string representation into a [ProtectDetectionType].
   static ProtectDetectionType fromString(String value) {
     final String normalized = value.trim().toLowerCase();
     switch (normalized) {

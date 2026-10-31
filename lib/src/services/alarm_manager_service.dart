@@ -7,12 +7,16 @@ import '../models/exception.dart';
 
 /// Service for interacting with UniFi Protect Alarm Manager webhooks.
 class AlarmManagerService {
+  /// Creates an [AlarmManagerService] with the given [options] and HTTP [client].
   AlarmManagerService({
     required this.options,
     required this.client,
   });
 
+  /// The active UniFi Protect client connection options.
   final UnifiProtectOptions options;
+
+  /// The HTTP client used to perform API requests.
   final http.Client client;
 
   /// Triggers a webhook configured in UniFi Protect Alarm Manager by [webhookId].

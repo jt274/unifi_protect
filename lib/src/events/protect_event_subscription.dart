@@ -10,13 +10,17 @@ import 'protect_event.dart';
 
 /// Real-time event streaming subscription via UniFi Protect WebSocket.
 class ProtectEventSubscription {
+  /// Creates a [ProtectEventSubscription] using the provided [options].
   ProtectEventSubscription({
     required this.options,
     this.reconnectInterval = const Duration(seconds: 10),
     this.channelFactory,
   });
 
+  /// The active UniFi Protect connection options.
   final UnifiProtectOptions options;
+
+  /// Time interval between automatic reconnection attempts if disconnected.
   final Duration reconnectInterval;
 
   /// Optional factory function for creating the underlying [WebSocketChannel].
