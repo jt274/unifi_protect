@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
 import '../client/unifi_protect_options.dart';
+import '../models/exception.dart';
 import '../models/liveview.dart';
 
 /// Service for managing UniFi Protect multi-camera live view layouts.
@@ -27,8 +27,9 @@ class LiveviewService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for listLiveviews',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -57,8 +58,9 @@ class LiveviewService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for getLiveview ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -85,8 +87,9 @@ class LiveviewService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to create live view (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -116,8 +119,9 @@ class LiveviewService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for updateLiveview ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -143,8 +147,9 @@ class LiveviewService {
     if (response.statusCode != 200 &&
         response.statusCode != 204 &&
         response.statusCode != 404) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to delete live view $id (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }

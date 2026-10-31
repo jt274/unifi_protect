@@ -150,12 +150,35 @@ void main() {
           host: '127.0.0.1',
           port: secureWsServer.port,
           apiKey: 'test-ws-key',
+          allowSelfSignedCertificates: true,
         );
         final ProtectEventSubscription subscription =
             ProtectEventSubscription(options: options);
         final bool connected = await subscription.connect();
         expect(connected, isTrue);
         await subscription.dispose();
+
+        final UnifiProtectOptions defaultOptions = UnifiProtectOptions(
+          host: '127.0.0.1',
+          port: secureWsServer.port,
+          apiKey: 'test-ws-key',
+        );
+        final ProtectEventSubscription rejectSubscription =
+            ProtectEventSubscription(options: defaultOptions);
+        expect(await rejectSubscription.connect(), isFalse);
+        await rejectSubscription.dispose();
+
+        final UnifiProtectOptions cloudOptions = UnifiProtectOptions(
+          host: '127.0.0.1',
+          port: secureWsServer.port,
+          apiKey: 'test-ws-key',
+          cloudConsoleId: 'cloud-console',
+          allowSelfSignedCertificates: true,
+        );
+        final ProtectEventSubscription cloudSub =
+            ProtectEventSubscription(options: cloudOptions);
+        expect(await cloudSub.connect(), isFalse);
+        await cloudSub.dispose();
       } finally {
         await secureWsServer.close(force: true);
       }

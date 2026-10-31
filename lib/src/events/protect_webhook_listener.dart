@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import '../models/detection_type.dart';
 import 'protect_event.dart';
+import 'webhook_server_adapter.dart';
 
 /// Embedded local HTTP server for receiving UniFi Protect Alarm Manager webhooks.
 class ProtectWebhookListener {
-  ProtectWebhookListener();
+  ProtectWebhookListener({WebhookServerAdapter? serverAdapter})
+      : _adapter = serverAdapter ?? createWebhookServer();
 
-  HttpServer? _server;
+  final WebhookServerAdapter _adapter;
   final StreamController<ProtectAlertEvent> _alertController =
       StreamController<ProtectAlertEvent>.broadcast();
 
@@ -17,91 +18,29 @@ class ProtectWebhookListener {
   Stream<ProtectAlertEvent> get alertStream => _alertController.stream;
 
   /// Bound local TCP port of the webhook listener.
-  int? get boundPort => _server?.port;
+  int? get boundPort => _adapter.boundPort;
 
   /// Whether the webhook server is actively listening.
-  bool get isListening => _server != null;
+  bool get isListening => _adapter.isListening;
 
   /// Starts listening for webhooks on [port] (defaults to 8765, or 0 for ephemeral).
-  Future<bool> start({int port = 8765, InternetAddress? address}) async {
-    await stop();
-    try {
-      _server = await HttpServer.bind(
-        address ?? InternetAddress.anyIPv4,
-        port,
-        shared: true,
-      );
-      _server!.listen(_handleRequest);
-      return true;
-    } catch (_) {
-      _server = null;
-      return false;
-    }
+  ///
+  /// On platforms without raw socket support (such as Web), this returns `false`.
+  Future<bool> start({int port = 8765, Object? address}) async {
+    return _adapter.start(
+      port: port,
+      address: address,
+      onEvent: (ProtectAlertEvent event) {
+        if (!_alertController.isClosed) {
+          _alertController.add(event);
+        }
+      },
+    );
   }
 
   /// Stops the webhook server.
   Future<void> stop() async {
-    try {
-      await _server?.close(force: true);
-    } catch (_) {}
-    _server = null;
-  }
-
-  Future<void> _handleRequest(HttpRequest request) async {
-    final String path = request.uri.path;
-
-    if (request.method == 'GET' && path == '/api/webhook/health') {
-      request.response
-        ..statusCode = HttpStatus.ok
-        ..headers.contentType = ContentType.json
-        ..write(
-          jsonEncode(<String, dynamic>{
-            'status': 'ok',
-            'port': boundPort,
-          }),
-        );
-      await request.response.close();
-      return;
-    }
-
-    if (request.method == 'POST' && path.startsWith('/api/webhook/trigger')) {
-      try {
-        final String bodyString = await utf8.decoder.bind(request).join();
-        final ProtectAlertEvent? event = parseWebhookRequest(
-          uri: request.uri,
-          bodyString: bodyString,
-        );
-
-        if (event != null && !_alertController.isClosed) {
-          _alertController.add(event);
-        }
-
-        request.response
-          ..statusCode = HttpStatus.ok
-          ..headers.contentType = ContentType.json
-          ..write(
-            jsonEncode(<String, dynamic>{
-              'status': 'triggered',
-              'matched': event != null,
-              'cameraId': event?.cameraId,
-              'detectionType': event?.detectionType.name,
-            }),
-          );
-      } catch (e) {
-        request.response
-          ..statusCode = HttpStatus.badRequest
-          ..headers.contentType = ContentType.json
-          ..write(jsonEncode(<String, dynamic>{'error': e.toString()}));
-      } finally {
-        await request.response.close();
-      }
-      return;
-    }
-
-    request.response
-      ..statusCode = HttpStatus.notFound
-      ..write('Not Found');
-    await request.response.close();
+    await _adapter.stop();
   }
 
   /// Parses incoming webhook query parameters and/or UniFi Protect Alarm Manager JSON payload.

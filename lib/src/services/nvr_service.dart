@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
 import '../client/unifi_protect_options.dart';
+import '../models/exception.dart';
 import '../models/meta_info.dart';
 import '../models/nvr.dart';
 
@@ -28,8 +28,9 @@ class NvrService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for getMetaInfo',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -59,8 +60,9 @@ class NvrService {
     }
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for getNvr',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -103,8 +105,9 @@ class NvrService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for updateNvr',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }

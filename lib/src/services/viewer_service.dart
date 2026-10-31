@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
 import '../client/unifi_protect_options.dart';
+import '../models/exception.dart';
 import '../models/viewer.dart';
 
 /// Service for managing UniFi Protect ViewPort HDMI display devices.
@@ -27,8 +27,9 @@ class ViewerService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for listViewers',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -57,8 +58,9 @@ class ViewerService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for getViewer ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -86,8 +88,9 @@ class ViewerService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for updateViewer ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }

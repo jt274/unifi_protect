@@ -10,8 +10,6 @@
         <img src="https://img.shields.io/badge/Donate-PayPal-00457C?logo=paypal" alt="Donate" />
     </a>
 </p>
-# UniFi Protect Dart Client (`unifi_protect`)
-
 A comprehensive, pure Dart client for the official Ubiquiti **UniFi Protect Integration API (v1)** (`developer.ui.com/protect`).
 
 Supports cameras, smart floodlights, multi-sensors, doorbells & chimes, ViewPort viewers, live views, NVR system status, Alarm Manager webhooks, and real-time WebSocket event streaming.
@@ -109,6 +107,20 @@ void main() async {
   // await client.close();
 }
 ```
+
+---
+
+## Web Support & Considerations
+
+`unifi_protect` is fully compatible with Flutter Web and web-compiled Dart applications, with no dependency on `dart:io`. When deploying to a browser environment, keep the following platform considerations in mind:
+
+- **CORS (Cross-Origin Resource Sharing)**: Direct HTTP requests from a browser to a local UniFi OS Console (e.g., `https://192.168.1.1`) are subject to browser CORS policies. If your UniFi OS Console does not serve CORS headers allowing your web origin, route requests through a lightweight backend reverse proxy (such as Nginx, Caddy, or a serverless function).
+- **Self-Signed SSL Certificates**: Web browsers strictly enforce TLS certificate validity at the browser/OS level. The `allowSelfSignedCertificates` option is effective on native platforms (iOS, Android, macOS, Linux, Windows), but browsers do not allow client-side JavaScript to ignore TLS validation. For browser environments, configure your console with a valid public certificate (e.g., Let's Encrypt) or use a reverse proxy with a trusted certificate.
+- **Cloud Mode (`api.ui.com`)**: Connecting remotely using `cloudConsoleId` routes through Ubiquiti's official Cloud Connector proxy (`https://api.ui.com`), which uses valid public CA-signed SSL certificates.
+- **WebSocket Event Subscriptions**: Browsers restrict WebSocket connections from sending custom HTTP request headers (like `X-API-KEY`) during the initial handshake. For custom web setups, you can supply a custom `channelFactory` to `ProtectEventSubscription` to connect through a backend proxy or relay.
+- **Embedded Webhook Server**: In browser sandboxes, binding a raw local TCP listening port is unsupported by Web standards. Consequently, `ProtectWebhookListener.start()` returns `false`. However, `ProtectWebhookListener.parseWebhookRequest()` is pure Dart and can be used on Web to parse webhook payloads received via serverless webhooks, web workers, or WebSocket push notifications.
+
+---
 
 ### Disclaimer
 

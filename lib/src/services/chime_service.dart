@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
 import '../client/unifi_protect_options.dart';
 import '../models/chime.dart';
+import '../models/exception.dart';
 
 /// Service for managing UniFi Protect smart chimes.
 class ChimeService {
@@ -27,8 +27,9 @@ class ChimeService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for listChimes',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -57,8 +58,9 @@ class ChimeService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for getChime ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -86,8 +88,9 @@ class ChimeService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for updateChime ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -111,8 +114,9 @@ class ChimeService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to play chime buzzer for $id (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }

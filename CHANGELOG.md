@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0 (2026-10-31)
+- Add full Web platform support.
+- Update docs.
+
 ## 0.1.0 (2026-10-31)
 - Initial release of `unifi_protect`.
 - Full official API feature parity for Ubiquiti UniFi Protect Integration API v1 (`developer.ui.com/protect`).

@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
 import '../client/unifi_protect_options.dart';
+import '../models/exception.dart';
 import '../models/light.dart';
 
 /// Service for managing UniFi Protect smart floodlights.
@@ -27,8 +27,9 @@ class LightService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for listLights',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -57,8 +58,9 @@ class LightService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for getLight ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -86,8 +88,9 @@ class LightService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for updateLight ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }

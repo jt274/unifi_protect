@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -102,10 +101,12 @@ void main() {
         options: const UnifiProtectOptions(apiKey: 'k', host: 'err'),
         client: mockClient,
       );
-      expect(() => errService.listLights(), throwsA(isA<HttpException>()));
-      expect(() => errService.getLight('err'), throwsA(isA<HttpException>()));
+      expect(
+          () => errService.listLights(), throwsA(isA<ProtectHttpException>()));
+      expect(() => errService.getLight('err'),
+          throwsA(isA<ProtectHttpException>()));
       expect(() => errService.updateLight('err', <String, dynamic>{}),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('listLights handles data envelope and empty map', () async {
@@ -227,10 +228,12 @@ void main() {
         options: const UnifiProtectOptions(apiKey: 'k', host: 'err'),
         client: mockClient,
       );
-      expect(() => errService.listSensors(), throwsA(isA<HttpException>()));
-      expect(() => errService.getSensor('err'), throwsA(isA<HttpException>()));
+      expect(
+          () => errService.listSensors(), throwsA(isA<ProtectHttpException>()));
+      expect(() => errService.getSensor('err'),
+          throwsA(isA<ProtectHttpException>()));
       expect(() => errService.updateSensor('err', <String, dynamic>{}),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('listSensors handles data envelope and empty map', () async {
@@ -340,11 +343,14 @@ void main() {
         options: const UnifiProtectOptions(apiKey: 'k', host: 'err'),
         client: mockClient,
       );
-      expect(() => errService.listChimes(), throwsA(isA<HttpException>()));
-      expect(() => errService.getChime('err'), throwsA(isA<HttpException>()));
+      expect(
+          () => errService.listChimes(), throwsA(isA<ProtectHttpException>()));
+      expect(() => errService.getChime('err'),
+          throwsA(isA<ProtectHttpException>()));
       expect(() => errService.updateChime('err', <String, dynamic>{}),
-          throwsA(isA<HttpException>()));
-      expect(() => errService.playBuzzer('err'), throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
+      expect(() => errService.playBuzzer('err'),
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('listChimes handles data envelope and empty map', () async {
@@ -448,10 +454,12 @@ void main() {
         options: const UnifiProtectOptions(apiKey: 'k', host: 'err'),
         client: mockClient,
       );
-      expect(() => errService.listViewers(), throwsA(isA<HttpException>()));
-      expect(() => errService.getViewer('err'), throwsA(isA<HttpException>()));
+      expect(
+          () => errService.listViewers(), throwsA(isA<ProtectHttpException>()));
+      expect(() => errService.getViewer('err'),
+          throwsA(isA<ProtectHttpException>()));
       expect(() => errService.updateViewer('err', <String, dynamic>{}),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('listViewers handles data envelope and empty map', () async {
