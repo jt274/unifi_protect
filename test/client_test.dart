@@ -6,6 +6,8 @@ import 'package:test/test.dart';
 import 'package:unifi_protect/src/client/http_adapter.dart';
 import 'package:unifi_protect/unifi_protect.dart';
 
+import 'test_certificates.dart';
+
 void main() {
   group('UnifiProtectOptions', () {
     test('default options set correct defaults', () {
@@ -20,11 +22,13 @@ void main() {
       expect(opts.isCloudMode, isFalse);
       expect(
         opts.baseUri,
-        equals(Uri.parse('https://192.168.1.1:443/proxy/protect/integration/v1')),
+        equals(
+            Uri.parse('https://192.168.1.1:443/proxy/protect/integration/v1')),
       );
       expect(
         opts.eventsWebSocketUri,
-        equals(Uri.parse('wss://192.168.1.1:443/proxy/protect/integration/v1/subscribe/events')),
+        equals(Uri.parse(
+            'wss://192.168.1.1:443/proxy/protect/integration/v1/subscribe/events')),
       );
       expect(
         opts.headers,
@@ -93,31 +97,12 @@ void main() {
       clientDisallow.close();
     });
 
-    test('badCertificateCallback executes and validates host on actual HTTPS request', () async {
-      final Directory tempDir =
-          Directory.systemTemp.createTempSync('ssl_test_');
-      final String certPath = '${tempDir.path}/cert.pem';
-      final String keyPath = '${tempDir.path}/key.pem';
-      Process.runSync('openssl', <String>[
-        'req',
-        '-x509',
-        '-newkey',
-        'rsa:2048',
-        '-keyout',
-        keyPath,
-        '-out',
-        certPath,
-        '-days',
-        '1',
-        '-nodes',
-        '-subj',
-        '/CN=localhost',
-      ]);
-      final SecurityContext context = SecurityContext()
-        ..useCertificateChain(certPath)
-        ..usePrivateKey(keyPath);
+    test(
+        'badCertificateCallback executes and validates host on actual HTTPS request',
+        () async {
+      final SecurityContext context = createTestSecurityContext();
       final HttpServer secureServer =
-          await HttpServer.bindSecure('localhost', 0, context);
+          await HttpServer.bindSecure(InternetAddress.loopbackIPv4, 0, context);
       final int port = secureServer.port;
       secureServer.listen((HttpRequest req) {
         req.response.write('secure ok');
@@ -126,29 +111,28 @@ void main() {
 
       try {
         final UnifiProtectOptions optsMatching = UnifiProtectOptions(
-          host: 'localhost',
+          host: '127.0.0.1',
           port: port,
           apiKey: 'key',
         );
         final http.Client clientMatching = createHttpClient(optsMatching);
         final http.Response resMatching =
-            await clientMatching.get(Uri.parse('https://localhost:$port/'));
+            await clientMatching.get(Uri.parse('https://127.0.0.1:$port/'));
         expect(resMatching.body, equals('secure ok'));
         clientMatching.close();
 
         final UnifiProtectOptions optsMismatch = UnifiProtectOptions(
-          host: '127.0.0.1',
+          host: 'otherhost',
           port: port,
           apiKey: 'key',
         );
         final http.Client clientMismatch = createHttpClient(optsMismatch);
         final http.Response resMismatch =
-            await clientMismatch.get(Uri.parse('https://localhost:$port/'));
+            await clientMismatch.get(Uri.parse('https://127.0.0.1:$port/'));
         expect(resMismatch.body, equals('secure ok'));
         clientMismatch.close();
       } finally {
         await secureServer.close(force: true);
-        tempDir.deleteSync(recursive: true);
       }
     });
   });
@@ -179,7 +163,8 @@ void main() {
       expect(client.alarmManager, isNotNull);
       expect(client.events, isNotNull);
 
-      final ProtectWebhookListener webhookListener = client.createWebhookListener();
+      final ProtectWebhookListener webhookListener =
+          client.createWebhookListener();
       expect(webhookListener, isNotNull);
       expect(webhookListener.isListening, isFalse);
       await webhookListener.dispose();

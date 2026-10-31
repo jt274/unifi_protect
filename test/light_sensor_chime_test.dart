@@ -12,7 +12,8 @@ void main() {
   );
 
   group('LightService', () {
-    test('listLights and controls work, handling errors and 204 updates', () async {
+    test('listLights and controls work, handling errors and 204 updates',
+        () async {
       final MockClient mockClient = MockClient((http.Request request) async {
         if (request.url.host == 'err' || request.url.path.contains('/err')) {
           return http.Response('Error', 500);
@@ -92,7 +93,8 @@ void main() {
       final ProtectLight dimmed = await service.setBrightness('light_1', 40);
       expect(dimmed.brightness, equals(40));
 
-      final ProtectLight updated204 = await service.updateLight('light_204', <String, dynamic>{});
+      final ProtectLight updated204 =
+          await service.updateLight('light_204', <String, dynamic>{});
       expect(updated204.id, equals('light_204'));
 
       // Error branches
@@ -102,26 +104,31 @@ void main() {
       );
       expect(() => errService.listLights(), throwsA(isA<HttpException>()));
       expect(() => errService.getLight('err'), throwsA(isA<HttpException>()));
-      expect(() => errService.updateLight('err', <String, dynamic>{}), throwsA(isA<HttpException>()));
+      expect(() => errService.updateLight('err', <String, dynamic>{}),
+          throwsA(isA<HttpException>()));
     });
 
     test('listLights handles data envelope and empty map', () async {
       final MockClient dataClient = MockClient((http.Request request) async {
-        return http.Response(jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
+        return http.Response(
+            jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
       });
-      final LightService dataService = LightService(options: options, client: dataClient);
+      final LightService dataService =
+          LightService(options: options, client: dataClient);
       expect(await dataService.listLights(), isEmpty);
 
       final MockClient emptyClient = MockClient((http.Request request) async {
         return http.Response(jsonEncode(<String, dynamic>{'none': true}), 200);
       });
-      final LightService emptyService = LightService(options: options, client: emptyClient);
+      final LightService emptyService =
+          LightService(options: options, client: emptyClient);
       expect(await emptyService.listLights(), isEmpty);
     });
   });
 
   group('SensorService', () {
-    test('listSensors, getSensor, and updateSensor work and handle errors', () async {
+    test('listSensors, getSensor, and updateSensor work and handle errors',
+        () async {
       final MockClient mockClient = MockClient((http.Request request) async {
         if (request.url.host == 'err' || request.url.path.contains('/err')) {
           return http.Response('Error', 500);
@@ -222,20 +229,24 @@ void main() {
       );
       expect(() => errService.listSensors(), throwsA(isA<HttpException>()));
       expect(() => errService.getSensor('err'), throwsA(isA<HttpException>()));
-      expect(() => errService.updateSensor('err', <String, dynamic>{}), throwsA(isA<HttpException>()));
+      expect(() => errService.updateSensor('err', <String, dynamic>{}),
+          throwsA(isA<HttpException>()));
     });
 
     test('listSensors handles data envelope and empty map', () async {
       final MockClient dataClient = MockClient((http.Request request) async {
-        return http.Response(jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
+        return http.Response(
+            jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
       });
-      final SensorService dataService = SensorService(options: options, client: dataClient);
+      final SensorService dataService =
+          SensorService(options: options, client: dataClient);
       expect(await dataService.listSensors(), isEmpty);
 
       final MockClient emptyClient = MockClient((http.Request request) async {
         return http.Response(jsonEncode(<String, dynamic>{'none': true}), 200);
       });
-      final SensorService emptyService = SensorService(options: options, client: emptyClient);
+      final SensorService emptyService =
+          SensorService(options: options, client: emptyClient);
       expect(await emptyService.listSensors(), isEmpty);
     });
   });
@@ -331,27 +342,32 @@ void main() {
       );
       expect(() => errService.listChimes(), throwsA(isA<HttpException>()));
       expect(() => errService.getChime('err'), throwsA(isA<HttpException>()));
-      expect(() => errService.updateChime('err', <String, dynamic>{}), throwsA(isA<HttpException>()));
+      expect(() => errService.updateChime('err', <String, dynamic>{}),
+          throwsA(isA<HttpException>()));
       expect(() => errService.playBuzzer('err'), throwsA(isA<HttpException>()));
     });
 
     test('listChimes handles data envelope and empty map', () async {
       final MockClient dataClient = MockClient((http.Request request) async {
-        return http.Response(jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
+        return http.Response(
+            jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
       });
-      final ChimeService dataService = ChimeService(options: options, client: dataClient);
+      final ChimeService dataService =
+          ChimeService(options: options, client: dataClient);
       expect(await dataService.listChimes(), isEmpty);
 
       final MockClient emptyClient = MockClient((http.Request request) async {
         return http.Response(jsonEncode(<String, dynamic>{'none': true}), 200);
       });
-      final ChimeService emptyService = ChimeService(options: options, client: emptyClient);
+      final ChimeService emptyService =
+          ChimeService(options: options, client: emptyClient);
       expect(await emptyService.listChimes(), isEmpty);
     });
   });
 
   group('ViewerService', () {
-    test('listViewers, getViewer, updateViewer, and assignLiveview work', () async {
+    test('listViewers, getViewer, updateViewer, and assignLiveview work',
+        () async {
       final MockClient mockClient = MockClient((http.Request request) async {
         if (request.url.host == 'err' || request.url.path.contains('/err')) {
           return http.Response('Error', 500);
@@ -434,20 +450,24 @@ void main() {
       );
       expect(() => errService.listViewers(), throwsA(isA<HttpException>()));
       expect(() => errService.getViewer('err'), throwsA(isA<HttpException>()));
-      expect(() => errService.updateViewer('err', <String, dynamic>{}), throwsA(isA<HttpException>()));
+      expect(() => errService.updateViewer('err', <String, dynamic>{}),
+          throwsA(isA<HttpException>()));
     });
 
     test('listViewers handles data envelope and empty map', () async {
       final MockClient dataClient = MockClient((http.Request request) async {
-        return http.Response(jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
+        return http.Response(
+            jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
       });
-      final ViewerService dataService = ViewerService(options: options, client: dataClient);
+      final ViewerService dataService =
+          ViewerService(options: options, client: dataClient);
       expect(await dataService.listViewers(), isEmpty);
 
       final MockClient emptyClient = MockClient((http.Request request) async {
         return http.Response(jsonEncode(<String, dynamic>{'none': true}), 200);
       });
-      final ViewerService emptyService = ViewerService(options: options, client: emptyClient);
+      final ViewerService emptyService =
+          ViewerService(options: options, client: emptyClient);
       expect(await emptyService.listViewers(), isEmpty);
     });
   });

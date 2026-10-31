@@ -132,29 +132,37 @@ void main() {
         client: mockClient,
       );
       expect(() => errService.listLiveviews(), throwsA(isA<HttpException>()));
-      expect(() => errService.getLiveview('err'), throwsA(isA<HttpException>()));
-      expect(() => errService.createLiveview(<String, dynamic>{}), throwsA(isA<HttpException>()));
-      expect(() => errService.updateLiveview('err', <String, dynamic>{}), throwsA(isA<HttpException>()));
-      expect(() => errService.deleteLiveview('err'), throwsA(isA<HttpException>()));
+      expect(
+          () => errService.getLiveview('err'), throwsA(isA<HttpException>()));
+      expect(() => errService.createLiveview(<String, dynamic>{}),
+          throwsA(isA<HttpException>()));
+      expect(() => errService.updateLiveview('err', <String, dynamic>{}),
+          throwsA(isA<HttpException>()));
+      expect(() => errService.deleteLiveview('err'),
+          throwsA(isA<HttpException>()));
     });
 
     test('listLiveviews handles data envelope and empty map', () async {
       final MockClient dataClient = MockClient((http.Request request) async {
-        return http.Response(jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
+        return http.Response(
+            jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
       });
-      final LiveviewService dataService = LiveviewService(options: options, client: dataClient);
+      final LiveviewService dataService =
+          LiveviewService(options: options, client: dataClient);
       expect(await dataService.listLiveviews(), isEmpty);
 
       final MockClient emptyClient = MockClient((http.Request request) async {
         return http.Response(jsonEncode(<String, dynamic>{'none': true}), 200);
       });
-      final LiveviewService emptyService = LiveviewService(options: options, client: emptyClient);
+      final LiveviewService emptyService =
+          LiveviewService(options: options, client: emptyClient);
       expect(await emptyService.listLiveviews(), isEmpty);
     });
   });
 
   group('NvrService', () {
-    test('getMetaInfo, getNvr, updateNvr work and handle errors and fallbacks', () async {
+    test('getMetaInfo, getNvr, updateNvr work and handle errors and fallbacks',
+        () async {
       bool useNvrs404 = false;
       bool returnDataEnvelope = false;
       bool returnInvalidFormat = false;
@@ -295,25 +303,30 @@ void main() {
       );
       expect(errService.getMetaInfo(), throwsA(isA<HttpException>()));
       expect(errService.getNvr(), throwsA(isA<HttpException>()));
-      expect(errService.updateNvr(<String, dynamic>{}), throwsA(isA<HttpException>()));
+      expect(errService.updateNvr(<String, dynamic>{}),
+          throwsA(isA<HttpException>()));
     });
   });
 
   group('AlarmManagerService', () {
-    test('triggerAlarmWebhook sends POST request or throws on failure', () async {
+    test('triggerAlarmWebhook sends POST request or throws on failure',
+        () async {
       int simulatedStatus = 200;
       final MockClient mockClient = MockClient((http.Request request) async {
         if (request.url.host == 'err' || request.url.path.contains('/err')) {
           return http.Response('Webhook failed', 500);
         }
         expect(request.method, equals('POST'));
-        expect(request.url.path, equals('/proxy/protect/integration/v1/alarm-manager/webhook/test_webhook_id'));
+        expect(
+            request.url.path,
+            equals(
+                '/proxy/protect/integration/v1/alarm-manager/webhook/test_webhook_id'));
         return http.Response('', simulatedStatus);
       });
 
       final AlarmManagerService service =
           AlarmManagerService(options: options, client: mockClient);
-      
+
       // 200 with payload
       await service.triggerAlarmWebhook(
         'test_webhook_id',

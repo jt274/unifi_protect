@@ -11,31 +11,53 @@ void main() {
       expect(ProtectDetectionType.animal.displayName, equals('Animal'));
       expect(ProtectDetectionType.ring.displayName, equals('Doorbell Ring'));
       expect(ProtectDetectionType.smoke.displayName, equals('Smoke Alarm'));
-      expect(ProtectDetectionType.cmonoxide.displayName, equals('Carbon Monoxide'));
+      expect(ProtectDetectionType.cmonoxide.displayName,
+          equals('Carbon Monoxide'));
       expect(ProtectDetectionType.siren.displayName, equals('Siren Alarm'));
     });
 
-    test('fromString parses all known string variants and falls back to motion', () {
-      expect(ProtectDetectionType.fromString('person'), equals(ProtectDetectionType.person));
-      expect(ProtectDetectionType.fromString('smartdetectzone.person'), equals(ProtectDetectionType.person));
-      expect(ProtectDetectionType.fromString('vehicle'), equals(ProtectDetectionType.vehicle));
-      expect(ProtectDetectionType.fromString('car'), equals(ProtectDetectionType.vehicle));
-      expect(ProtectDetectionType.fromString('smartdetectzone.vehicle'), equals(ProtectDetectionType.vehicle));
-      expect(ProtectDetectionType.fromString('package'), equals(ProtectDetectionType.package));
-      expect(ProtectDetectionType.fromString('smartdetectzone.package'), equals(ProtectDetectionType.package));
-      expect(ProtectDetectionType.fromString('animal'), equals(ProtectDetectionType.animal));
-      expect(ProtectDetectionType.fromString('pet'), equals(ProtectDetectionType.animal));
-      expect(ProtectDetectionType.fromString('smartdetectzone.animal'), equals(ProtectDetectionType.animal));
-      expect(ProtectDetectionType.fromString('ring'), equals(ProtectDetectionType.ring));
-      expect(ProtectDetectionType.fromString('doorbell'), equals(ProtectDetectionType.ring));
-      expect(ProtectDetectionType.fromString('smoke'), equals(ProtectDetectionType.smoke));
-      expect(ProtectDetectionType.fromString('smokealarm'), equals(ProtectDetectionType.smoke));
-      expect(ProtectDetectionType.fromString('co'), equals(ProtectDetectionType.cmonoxide));
-      expect(ProtectDetectionType.fromString('cmonoxide'), equals(ProtectDetectionType.cmonoxide));
-      expect(ProtectDetectionType.fromString('carbonmonoxide'), equals(ProtectDetectionType.cmonoxide));
-      expect(ProtectDetectionType.fromString('siren'), equals(ProtectDetectionType.siren));
-      expect(ProtectDetectionType.fromString('motion'), equals(ProtectDetectionType.motion));
-      expect(ProtectDetectionType.fromString('unknown_type'), equals(ProtectDetectionType.motion));
+    test('fromString parses all known string variants and falls back to motion',
+        () {
+      expect(ProtectDetectionType.fromString('person'),
+          equals(ProtectDetectionType.person));
+      expect(ProtectDetectionType.fromString('smartdetectzone.person'),
+          equals(ProtectDetectionType.person));
+      expect(ProtectDetectionType.fromString('vehicle'),
+          equals(ProtectDetectionType.vehicle));
+      expect(ProtectDetectionType.fromString('car'),
+          equals(ProtectDetectionType.vehicle));
+      expect(ProtectDetectionType.fromString('smartdetectzone.vehicle'),
+          equals(ProtectDetectionType.vehicle));
+      expect(ProtectDetectionType.fromString('package'),
+          equals(ProtectDetectionType.package));
+      expect(ProtectDetectionType.fromString('smartdetectzone.package'),
+          equals(ProtectDetectionType.package));
+      expect(ProtectDetectionType.fromString('animal'),
+          equals(ProtectDetectionType.animal));
+      expect(ProtectDetectionType.fromString('pet'),
+          equals(ProtectDetectionType.animal));
+      expect(ProtectDetectionType.fromString('smartdetectzone.animal'),
+          equals(ProtectDetectionType.animal));
+      expect(ProtectDetectionType.fromString('ring'),
+          equals(ProtectDetectionType.ring));
+      expect(ProtectDetectionType.fromString('doorbell'),
+          equals(ProtectDetectionType.ring));
+      expect(ProtectDetectionType.fromString('smoke'),
+          equals(ProtectDetectionType.smoke));
+      expect(ProtectDetectionType.fromString('smokealarm'),
+          equals(ProtectDetectionType.smoke));
+      expect(ProtectDetectionType.fromString('co'),
+          equals(ProtectDetectionType.cmonoxide));
+      expect(ProtectDetectionType.fromString('cmonoxide'),
+          equals(ProtectDetectionType.cmonoxide));
+      expect(ProtectDetectionType.fromString('carbonmonoxide'),
+          equals(ProtectDetectionType.cmonoxide));
+      expect(ProtectDetectionType.fromString('siren'),
+          equals(ProtectDetectionType.siren));
+      expect(ProtectDetectionType.fromString('motion'),
+          equals(ProtectDetectionType.motion));
+      expect(ProtectDetectionType.fromString('unknown_type'),
+          equals(ProtectDetectionType.motion));
     });
   });
 
@@ -51,7 +73,8 @@ void main() {
       expect(StreamQuality.fromString('high'), equals(StreamQuality.high));
       expect(StreamQuality.fromString('medium'), equals(StreamQuality.medium));
       expect(StreamQuality.fromString('med'), equals(StreamQuality.medium));
-      expect(StreamQuality.fromString('package'), equals(StreamQuality.package));
+      expect(
+          StreamQuality.fromString('package'), equals(StreamQuality.package));
       expect(StreamQuality.fromString('low'), equals(StreamQuality.low));
       expect(StreamQuality.fromString('unknown'), equals(StreamQuality.low));
     });
@@ -152,26 +175,32 @@ void main() {
 
     test('matchesQuality branches', () {
       // package channel
-      const CameraChannel pkgCh = CameraChannel(id: 3, name: 'Package', isRtspEnabled: true);
+      const CameraChannel pkgCh =
+          CameraChannel(id: 3, name: 'Package', isRtspEnabled: true);
       expect(pkgCh.matchesQuality(StreamQuality.package), isTrue);
       expect(pkgCh.matchesQuality(StreamQuality.low), isFalse);
       expect(pkgCh.matchesQuality(StreamQuality.medium), isFalse);
       expect(pkgCh.matchesQuality(StreamQuality.high), isFalse);
 
       // medium channel
-      const CameraChannel medCh1 = CameraChannel(id: 1, name: 'Medium', isRtspEnabled: true);
+      const CameraChannel medCh1 =
+          CameraChannel(id: 1, name: 'Medium', isRtspEnabled: true);
       expect(medCh1.matchesQuality(StreamQuality.medium), isTrue);
-      const CameraChannel medCh2 = CameraChannel(id: 9, name: '720p', isRtspEnabled: true, width: 1280);
+      const CameraChannel medCh2 =
+          CameraChannel(id: 9, name: '720p', isRtspEnabled: true, width: 1280);
       expect(medCh2.matchesQuality(StreamQuality.medium), isTrue);
 
       // high channel
-      const CameraChannel highCh1 = CameraChannel(id: 0, name: 'High', isRtspEnabled: true);
+      const CameraChannel highCh1 =
+          CameraChannel(id: 0, name: 'High', isRtspEnabled: true);
       expect(highCh1.matchesQuality(StreamQuality.high), isTrue);
-      const CameraChannel highCh2 = CameraChannel(id: 9, name: '4K', isRtspEnabled: true, width: 3840);
+      const CameraChannel highCh2 =
+          CameraChannel(id: 9, name: '4K', isRtspEnabled: true, width: 3840);
       expect(highCh2.matchesQuality(StreamQuality.high), isTrue);
 
       // null dimensions
-      const CameraChannel noDimCh = CameraChannel(id: 9, name: 'Custom', isRtspEnabled: true);
+      const CameraChannel noDimCh =
+          CameraChannel(id: 9, name: 'Custom', isRtspEnabled: true);
       expect(noDimCh.aspectRatio, isNull);
     });
   });
@@ -223,11 +252,16 @@ void main() {
       expect(cam.hasSpeaker, isTrue);
       expect(cam.hasMicrophone, isTrue);
       expect(cam.isOnline, isTrue);
-      expect(cam.supportedDetectionTypes, contains(ProtectDetectionType.motion));
-      expect(cam.supportedDetectionTypes, contains(ProtectDetectionType.person));
-      expect(cam.supportedDetectionTypes, contains(ProtectDetectionType.vehicle));
-      expect(cam.getChannelForQuality(StreamQuality.high)?.rtspAlias, equals('HighAlias'));
-      expect(cam.getChannelForQuality(StreamQuality.low)?.rtspAlias, equals('LowAlias'));
+      expect(
+          cam.supportedDetectionTypes, contains(ProtectDetectionType.motion));
+      expect(
+          cam.supportedDetectionTypes, contains(ProtectDetectionType.person));
+      expect(
+          cam.supportedDetectionTypes, contains(ProtectDetectionType.vehicle));
+      expect(cam.getChannelForQuality(StreamQuality.high)?.rtspAlias,
+          equals('HighAlias'));
+      expect(cam.getChannelForQuality(StreamQuality.low)?.rtspAlias,
+          equals('LowAlias'));
       expect(cam.packageChannel, isNull);
 
       final Map<String, dynamic> json = cam.toJson();
@@ -237,7 +271,9 @@ void main() {
       expect(json['hasPtz'], isTrue);
     });
 
-    test('smartDetectSettings objectTypes fallback and doorbell package detections', () {
+    test(
+        'smartDetectSettings objectTypes fallback and doorbell package detections',
+        () {
       final ProtectCamera cam = ProtectCamera.fromJson(<String, dynamic>{
         'id': 'doorbell_pro',
         'name': 'Doorbell Pro',
@@ -249,13 +285,18 @@ void main() {
         'isDoorbell': true,
       });
 
-      expect(cam.supportedDetectionTypes, contains(ProtectDetectionType.person));
-      expect(cam.supportedDetectionTypes, contains(ProtectDetectionType.animal));
-      expect(cam.supportedDetectionTypes, contains(ProtectDetectionType.package));
+      expect(
+          cam.supportedDetectionTypes, contains(ProtectDetectionType.person));
+      expect(
+          cam.supportedDetectionTypes, contains(ProtectDetectionType.animal));
+      expect(
+          cam.supportedDetectionTypes, contains(ProtectDetectionType.package));
       expect(cam.supportedDetectionTypes, contains(ProtectDetectionType.ring));
     });
 
-    test('hasSmartDetect true with no smartDetectTypes defaults to person and vehicle', () {
+    test(
+        'hasSmartDetect true with no smartDetectTypes defaults to person and vehicle',
+        () {
       final ProtectCamera cam = ProtectCamera.fromJson(<String, dynamic>{
         'id': 'cam_smart',
         'name': 'Smart Cam',
@@ -263,8 +304,10 @@ void main() {
           'hasSmartDetect': true,
         },
       });
-      expect(cam.supportedDetectionTypes, contains(ProtectDetectionType.person));
-      expect(cam.supportedDetectionTypes, contains(ProtectDetectionType.vehicle));
+      expect(
+          cam.supportedDetectionTypes, contains(ProtectDetectionType.person));
+      expect(
+          cam.supportedDetectionTypes, contains(ProtectDetectionType.vehicle));
     });
   });
 
@@ -344,7 +387,8 @@ void main() {
       expect(json['volume'], equals(70));
       expect(json['cameraIds'], contains('cam_doorbell'));
 
-      final ProtectChime chimeWithMaps = ProtectChime.fromJson(<String, dynamic>{
+      final ProtectChime chimeWithMaps =
+          ProtectChime.fromJson(<String, dynamic>{
         'id': 'chime_2',
         'name': 'Chime With Maps',
         'cameras': <dynamic>[
@@ -381,7 +425,8 @@ void main() {
 
   group('ProtectLiveview', () {
     test('LiveviewSlot and ProtectLiveview fromJson and toJson', () {
-      final ProtectLiveview liveview = ProtectLiveview.fromJson(<String, dynamic>{
+      final ProtectLiveview liveview =
+          ProtectLiveview.fromJson(<String, dynamic>{
         'id': 'view_1',
         'name': 'Overview 4-Grid',
         'isDefault': true,
@@ -405,7 +450,8 @@ void main() {
       expect(json['id'], equals('view_1'));
       expect(json['slots'], hasLength(1));
 
-      final ProtectLiveview liveviewWithMaps = ProtectLiveview.fromJson(<String, dynamic>{
+      final ProtectLiveview liveviewWithMaps =
+          ProtectLiveview.fromJson(<String, dynamic>{
         'id': 'view_2',
         'name': 'View With Maps',
         'slots': <dynamic>[
@@ -416,7 +462,8 @@ void main() {
           },
         ],
       });
-      expect(liveviewWithMaps.slots[0].cameraIds, contains('cam_from_map_slot'));
+      expect(
+          liveviewWithMaps.slots[0].cameraIds, contains('cam_from_map_slot'));
     });
   });
 
