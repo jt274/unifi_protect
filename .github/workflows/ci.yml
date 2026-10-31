@@ -1,0 +1,172 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint_and_analyze:
+    name: Lint & Analyze
+    runs-on: ubuntu-latest
+    # Requires maintainer approval via GitHub Environment protection rules when run on PRs
+    environment: ${{ github.event_name == 'pull_request' && 'maintainer-approval' || '' }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install Dependencies
+        run: dart pub get
+
+      - name: Verify Code Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze Code (Zero Warnings & Errors)
+        run: dart analyze --fatal-infos --fatal-warnings
+
+  test:
+    name: Run Tests & Coverage
+    runs-on: ubuntu-latest
+    needs: lint_and_analyze
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install Dependencies
+        run: dart pub get
+
+      - name: Run Tests with Coverage
+        run: |
+          dart test --coverage=coverage --reporter=expanded
+          dart run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
+
+      - name: Check Coverage File
+        run: |
+          if [ ! -f coverage/lcov.info ]; then
+            echo "Error: coverage/lcov.info was not generated!"
+            exit 1
+          fi
+
+      - name: Upload Coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        continue-on-error: true
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage/lcov.info
+
+      - name: Comment PR with Coverage Info & Change
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // 1. Parse LCOV file
+            const content = fs.readFileSync('coverage/lcov.info', 'utf8');
+            const records = content.split('end_of_record');
+            let totalLf = 0;
+            let totalLh = 0;
+            const files = [];
+
+            for (const r of records) {
+              const sf = r.match(/SF:(.+)/);
+              const lf = r.match(/LF:(\d+)/);
+              const lh = r.match(/LH:(\d+)/);
+              if (sf && lf && lh) {
+                const fullPath = sf[1].trim();
+                const lfn = parseInt(lf[1], 10);
+                const lhn = parseInt(lh[1], 10);
+                totalLf += lfn;
+                totalLh += lhn;
+                const shortPath = fullPath.replace(/^.*\/lib\//, 'lib/');
+                const pct = lfn > 0 ? (lhn / lfn) * 100 : 0;
+                files.push({ file: shortPath, lf: lfn, lh: lhn, pct });
+              }
+            }
+
+            const totalPct = totalLf > 0 ? (totalLh / totalLf) * 100 : 0;
+
+            // 2. Fetch baseline coverage for main branch from Coveralls API
+            let baseCoverage = null;
+            try {
+              const res = await fetch(`https://coveralls.io/github/${context.repo.owner}/${context.repo.repo}.json?branch=main`);
+              if (res.ok) {
+                const data = await res.json();
+                if (data && typeof data.covered_percent === 'number') {
+                  baseCoverage = data.covered_percent;
+                }
+              }
+            } catch (e) {
+              // Ignore network or missing coveralls baseline
+            }
+
+            // 3. Compute delta
+            let changeText = 'N/A (initial baseline on main)';
+            if (baseCoverage !== null) {
+              const diff = totalPct - baseCoverage;
+              if (diff > 0.001) {
+                changeText = `+${diff.toFixed(2)}% 🟢 (Increased from ${baseCoverage.toFixed(2)}%)`;
+              } else if (diff < -0.001) {
+                changeText = `${diff.toFixed(2)}% 🔴 (Decreased from ${baseCoverage.toFixed(2)}%)`;
+              } else {
+                changeText = `0.00% ⚪ (Unchanged from ${baseCoverage.toFixed(2)}%)`;
+              }
+            }
+
+            // 4. Construct Markdown comment
+            const commentMarker = '<!-- unifi-protect-coverage-report -->';
+            let body = `${commentMarker}\n## 📊 Code Coverage Report\n\n`;
+            body += `| Metric | Current PR | Base (\`main\`) | Change |\n`;
+            body += `| :--- | :--- | :--- | :--- |\n`;
+            body += `| **Line Coverage** | **${totalPct.toFixed(2)}%** (${totalLh}/${totalLf} lines) | ${baseCoverage !== null ? `${baseCoverage.toFixed(2)}%` : 'N/A'} | ${changeText} |\n\n`;
+
+            body += `<details><summary>📁 <b>File Coverage Breakdown (${files.length} files)</b></summary>\n\n`;
+            body += `| File | Lines Hit | Total Lines | Coverage |\n`;
+            body += `| :--- | :--- | :--- | :--- |\n`;
+            for (const f of files.sort((a, b) => a.file.localeCompare(b.file))) {
+              const indicator = f.pct >= 80 ? '🟢' : (f.pct >= 50 ? '🟡' : '🔴');
+              body += `| \`${f.file}\` | ${f.lh} | ${f.lf} | ${indicator} ${f.pct.toFixed(2)}% |\n`;
+            }
+            body += `\n</details>\n`;
+
+            // 5. Create or update comment on the pull request
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.find(c => c.body && c.body.includes(commentMarker));
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body,
+              });
+            }

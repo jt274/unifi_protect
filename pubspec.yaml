@@ -1,0 +1,29 @@
+name: unifi_protect
+description: "A comprehensive, pure Dart client for the Ubiquiti UniFi Protect Integration API (v1)."
+version: 0.1.0
+homepage: https://github.com/example/unifi_protect
+repository: https://github.com/example/unifi_protect
+
+environment:
+  sdk: ^3.5.0
+
+platforms:
+  android:
+  ios:
+  web:
+  linux:
+  windows:
+  macos:
+
+dependencies:
+  http: ^1.6.0
+  meta: ^1.19.0
+  web_socket_channel: ^3.0.3
+
+dev_dependencies:
+  coverage: ^1.16.0
+  lints: ^6.1.0
+  test: ^1.33.0
+
+funding:
+  - https://www.paypal.com/ncp/payment/HFAXZ7CTFQC6L
