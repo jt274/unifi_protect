@@ -18,10 +18,13 @@ void main() {
       await listener.dispose();
     });
 
-    test('parseWebhookRequest parses query string triggers including active=false', () {
+    test(
+        'parseWebhookRequest parses query string triggers including active=false',
+        () {
       final Uri uri = Uri.parse(
           'http://localhost:8765/api/webhook/trigger?camera=driveway&type=vehicle&active=false');
-      final ProtectAlertEvent? alert = ProtectWebhookListener.parseWebhookRequest(
+      final ProtectAlertEvent? alert =
+          ProtectWebhookListener.parseWebhookRequest(
         uri: uri,
         bodyString: '',
       );
@@ -32,7 +35,9 @@ void main() {
       expect(alert.isActive, isFalse);
     });
 
-    test('parseWebhookRequest parses Alarm Manager JSON payload and various detection inferences', () {
+    test(
+        'parseWebhookRequest parses Alarm Manager JSON payload and various detection inferences',
+        () {
       // 1. triggers with key
       final String payloadTriggers = jsonEncode(<String, dynamic>{
         'alarm': <String, dynamic>{
@@ -46,7 +51,8 @@ void main() {
         },
       });
 
-      final ProtectAlertEvent? alertTriggers = ProtectWebhookListener.parseWebhookRequest(
+      final ProtectAlertEvent? alertTriggers =
+          ProtectWebhookListener.parseWebhookRequest(
         uri: Uri.parse('http://localhost:8765/api/webhook/trigger'),
         bodyString: payloadTriggers,
       );
@@ -62,7 +68,8 @@ void main() {
             ],
           },
         });
-        final ProtectAlertEvent? alert = ProtectWebhookListener.parseWebhookRequest(
+        final ProtectAlertEvent? alert =
+            ProtectWebhookListener.parseWebhookRequest(
           uri: Uri.parse('http://localhost:8765/api/webhook/trigger'),
           bodyString: payload,
         );
@@ -70,14 +77,16 @@ void main() {
       }
 
       // 3. sources fallback and alarm name detection
-      final Map<String, ProtectDetectionType> alarmNames = <String, ProtectDetectionType>{
+      final Map<String, ProtectDetectionType> alarmNames =
+          <String, ProtectDetectionType>{
         'Driveway Vehicle Detected': ProtectDetectionType.vehicle,
         'Porch Package Delivered': ProtectDetectionType.package,
         'Yard Animal Sighted': ProtectDetectionType.animal,
         'Front Doorbell Ringing': ProtectDetectionType.ring,
       };
 
-      for (final MapEntry<String, ProtectDetectionType> entry in alarmNames.entries) {
+      for (final MapEntry<String, ProtectDetectionType> entry
+          in alarmNames.entries) {
         final String payloadSources = jsonEncode(<String, dynamic>{
           'alarm': <String, dynamic>{
             'name': entry.key,
@@ -88,7 +97,8 @@ void main() {
           'isActive': false,
         });
 
-        final ProtectAlertEvent? alert = ProtectWebhookListener.parseWebhookRequest(
+        final ProtectAlertEvent? alert =
+            ProtectWebhookListener.parseWebhookRequest(
           uri: Uri.parse('http://localhost:8765/api/webhook/trigger'),
           bodyString: payloadSources,
         );
@@ -105,7 +115,8 @@ void main() {
           ],
         },
       });
-      final ProtectAlertEvent? alertSourceId = ProtectWebhookListener.parseWebhookRequest(
+      final ProtectAlertEvent? alertSourceId =
+          ProtectWebhookListener.parseWebhookRequest(
         uri: Uri.parse('http://localhost:8765/api/webhook/trigger'),
         bodyString: payloadSourceId,
       );
@@ -117,7 +128,8 @@ void main() {
         'event': 'ring',
         'isActive': true,
       });
-      final ProtectAlertEvent? alertDirect = ProtectWebhookListener.parseWebhookRequest(
+      final ProtectAlertEvent? alertDirect =
+          ProtectWebhookListener.parseWebhookRequest(
         uri: Uri.parse('http://localhost:8765/api/webhook/trigger'),
         bodyString: payloadDirect,
       );
@@ -134,7 +146,9 @@ void main() {
       );
     });
 
-    test('embedded HTTP server responds to health check, trigger, 404, invalid utf8, and handles bind error', () async {
+    test(
+        'embedded HTTP server responds to health check, trigger, 404, invalid utf8, and handles bind error',
+        () async {
       // Bind error returns false
       final bool startFailed = await listener.start(port: -1);
       expect(startFailed, isFalse);
@@ -163,7 +177,8 @@ void main() {
       });
 
       final http.Response triggerResp = await http.post(
-        Uri.parse('http://127.0.0.1:$port/api/webhook/trigger?camera=backyard&type=animal'),
+        Uri.parse(
+            'http://127.0.0.1:$port/api/webhook/trigger?camera=backyard&type=animal'),
       );
       expect(triggerResp.statusCode, equals(200));
 
@@ -173,8 +188,8 @@ void main() {
       expect(alert.detectionType, equals(ProtectDetectionType.animal));
 
       // 3. 404 on unknown path
-      final http.Response notFoundResp = await http
-          .get(Uri.parse('http://127.0.0.1:$port/unknown/path'));
+      final http.Response notFoundResp =
+          await http.get(Uri.parse('http://127.0.0.1:$port/unknown/path'));
       expect(notFoundResp.statusCode, equals(404));
 
       // 4. Bad request handling with invalid UTF-8 bytes to trigger catch block

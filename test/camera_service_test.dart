@@ -13,9 +13,11 @@ void main() {
   );
 
   group('CameraService', () {
-    test('listCameras parses cameras, featureFlags, and channels accurately', () async {
+    test('listCameras parses cameras, featureFlags, and channels accurately',
+        () async {
       final MockClient mockClient = MockClient((http.Request request) async {
-        expect(request.url.path, equals('/proxy/protect/integration/v1/cameras'));
+        expect(
+            request.url.path, equals('/proxy/protect/integration/v1/cameras'));
         expect(request.headers['X-API-KEY'], equals('test-api-key-12345'));
 
         final List<Map<String, Object>> responsePayload = <Map<String, Object>>[
@@ -81,7 +83,8 @@ void main() {
         return http.Response(jsonEncode(responsePayload), 200);
       });
 
-      final CameraService service = CameraService(options: options, client: mockClient);
+      final CameraService service =
+          CameraService(options: options, client: mockClient);
       final List<ProtectCamera> cameras = await service.listCameras();
 
       expect(cameras, hasLength(2));
@@ -93,8 +96,10 @@ void main() {
       expect(doorbell.hasPackageCamera, isTrue);
       expect(doorbell.channels, hasLength(3));
       expect(doorbell.packageChannel?.rtspAlias, equals('TokenPackage123'));
-      expect(doorbell.supportedDetectionTypes, contains(ProtectDetectionType.ring));
-      expect(doorbell.supportedDetectionTypes, contains(ProtectDetectionType.package));
+      expect(doorbell.supportedDetectionTypes,
+          contains(ProtectDetectionType.ring));
+      expect(doorbell.supportedDetectionTypes,
+          contains(ProtectDetectionType.package));
 
       // AI Pro
       final ProtectCamera aiPro = cameras[1];
@@ -111,23 +116,30 @@ void main() {
       );
     });
 
-    test('listCameras with data map payload, non-list envelope, and error handling', () async {
+    test(
+        'listCameras with data map payload, non-list envelope, and error handling',
+        () async {
       final MockClient okClient = MockClient((http.Request request) async {
-        return http.Response(jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
+        return http.Response(
+            jsonEncode(<String, dynamic>{'data': <dynamic>[]}), 200);
       });
-      final CameraService okService = CameraService(options: options, client: okClient);
+      final CameraService okService =
+          CameraService(options: options, client: okClient);
       expect(await okService.listCameras(), isEmpty);
 
       final MockClient emptyClient = MockClient((http.Request request) async {
-        return http.Response(jsonEncode(<String, dynamic>{'unexpected': true}), 200);
+        return http.Response(
+            jsonEncode(<String, dynamic>{'unexpected': true}), 200);
       });
-      final CameraService emptyService = CameraService(options: options, client: emptyClient);
+      final CameraService emptyService =
+          CameraService(options: options, client: emptyClient);
       expect(await emptyService.listCameras(), isEmpty);
 
       final MockClient errClient = MockClient((http.Request request) async {
         return http.Response('Server Error', 500);
       });
-      final CameraService errService = CameraService(options: options, client: errClient);
+      final CameraService errService =
+          CameraService(options: options, client: errClient);
       expect(() => errService.listCameras(), throwsA(isA<HttpException>()));
     });
 
@@ -150,18 +162,22 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final CameraService service = CameraService(options: options, client: mockClient);
+      final CameraService service =
+          CameraService(options: options, client: mockClient);
       final ProtectCamera cam = await service.getCamera('cam123');
 
       expect(cam.id, equals('cam123'));
       expect(cam.name, equals('Backyard G5'));
       expect(cam.isOnline, isTrue);
 
-      expect(() => service.getCamera('not_found'), throwsA(isA<HttpException>()));
-      expect(() => service.getCamera('bad_format'), throwsA(isA<FormatException>()));
+      expect(
+          () => service.getCamera('not_found'), throwsA(isA<HttpException>()));
+      expect(() => service.getCamera('bad_format'),
+          throwsA(isA<FormatException>()));
     });
 
-    test('updateCamera sends PATCH request and parses result or throws', () async {
+    test('updateCamera sends PATCH request and parses result or throws',
+        () async {
       final MockClient mockClient = MockClient((http.Request request) async {
         if (request.url.path.endsWith('/err')) {
           return http.Response('Error', 500);
@@ -170,7 +186,8 @@ void main() {
           if (request.url.path.endsWith('/cam204')) {
             return http.Response('', 204);
           }
-          final Map<String, dynamic> body = jsonDecode(request.body) as Map<String, dynamic>;
+          final Map<String, dynamic> body =
+              jsonDecode(request.body) as Map<String, dynamic>;
           return http.Response(
             jsonEncode(<String, String>{
               'id': 'cam123',
@@ -179,7 +196,8 @@ void main() {
             }),
             200,
           );
-        } else if (request.method == 'GET' && request.url.path.endsWith('/cam204')) {
+        } else if (request.method == 'GET' &&
+            request.url.path.endsWith('/cam204')) {
           return http.Response(
             jsonEncode(<String, String>{
               'id': 'cam204',
@@ -192,19 +210,23 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final CameraService service = CameraService(options: options, client: mockClient);
+      final CameraService service =
+          CameraService(options: options, client: mockClient);
       final ProtectCamera updated = await service
           .updateCamera('cam123', <String, dynamic>{'name': 'New Camera Name'});
       expect(updated.name, equals('New Camera Name'));
 
-      final ProtectCamera via204 = await service.updateCamera('cam204', <String, dynamic>{});
+      final ProtectCamera via204 =
+          await service.updateCamera('cam204', <String, dynamic>{});
       expect(via204.name, equals('Fetched After 204'));
 
-      expect(() => service.updateCamera('err', <String, dynamic>{}), throwsA(isA<HttpException>()));
+      expect(() => service.updateCamera('err', <String, dynamic>{}),
+          throwsA(isA<HttpException>()));
     });
 
     test('getSnapshot returns raw image bytes or throws', () async {
-      final Uint8List mockBytes = Uint8List.fromList(<int>[0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10]);
+      final Uint8List mockBytes =
+          Uint8List.fromList(<int>[0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10]);
       final MockClient mockClient = MockClient((http.Request request) async {
         if (request.url.path.contains('/err/snapshot')) {
           return http.Response('Error', 500);
@@ -213,14 +235,17 @@ void main() {
             headers: <String, String>{'Content-Type': 'image/jpeg'});
       });
 
-      final CameraService service = CameraService(options: options, client: mockClient);
-      final Uint8List bytes = await service.getSnapshot('cam123', channel: 'package', highQuality: true);
+      final CameraService service =
+          CameraService(options: options, client: mockClient);
+      final Uint8List bytes = await service.getSnapshot('cam123',
+          channel: 'package', highQuality: true);
       expect(bytes, equals(mockBytes));
 
       expect(() => service.getSnapshot('err'), throwsA(isA<HttpException>()));
     });
 
-    test('getRtspsStreams and createRtspsStream handle stream URLs and errors', () async {
+    test('getRtspsStreams and createRtspsStream handle stream URLs and errors',
+        () async {
       final MockClient mockClient = MockClient((http.Request request) async {
         if (request.url.path.contains('/err/rtsps-stream')) {
           return http.Response('Error', 500);
@@ -247,17 +272,19 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final CameraService service = CameraService(options: options, client: mockClient);
+      final CameraService service =
+          CameraService(options: options, client: mockClient);
 
-      final Map<String, String> streams = await service.getRtspsStreams('cam123');
+      final Map<String, String> streams =
+          await service.getRtspsStreams('cam123');
       expect(streams['high'], equals('rtsp://192.168.1.1:7447/TokenHigh'));
       expect(streams['low'], equals('rtsp://192.168.1.1:7447/TokenLow'));
 
       expect(await service.getRtspsStreams('err'), isEmpty);
       expect(await service.getRtspsStreams('bad_json'), isEmpty);
 
-      final Map<String, String> created =
-          await service.createRtspsStream('cam123', qualities: <String>['package']);
+      final Map<String, String> created = await service
+          .createRtspsStream('cam123', qualities: <String>['package']);
       expect(created['package'], equals('rtsp://192.168.1.1:7447/TokenPkg'));
 
       expect(
@@ -281,14 +308,17 @@ void main() {
         return http.Response('Internal Error', 500);
       });
 
-      final CameraService service = CameraService(options: options, client: mockClient);
+      final CameraService service =
+          CameraService(options: options, client: mockClient);
       await service.deleteRtspsStream('cam_ok');
       await service.deleteRtspsStream('cam_204');
       await service.deleteRtspsStream('cam_404');
-      expect(() => service.deleteRtspsStream('cam_500'), throwsA(isA<HttpException>()));
+      expect(() => service.deleteRtspsStream('cam_500'),
+          throwsA(isA<HttpException>()));
     });
 
-    test('PTZ controls execute POST requests correctly and handle failures', () async {
+    test('PTZ controls execute POST requests correctly and handle failures',
+        () async {
       final List<String> actions = <String>[];
       final MockClient mockClient = MockClient((http.Request request) async {
         if (request.url.path.contains('/err/')) {
@@ -298,7 +328,8 @@ void main() {
         return http.Response('', 200);
       });
 
-      final CameraService service = CameraService(options: options, client: mockClient);
+      final CameraService service =
+          CameraService(options: options, client: mockClient);
 
       await service.moveToPtzPreset('ptz1', 2);
       await service.startPtzPatrol('ptz1', 0);
@@ -315,16 +346,21 @@ void main() {
         ]),
       );
 
-      expect(() => service.moveToPtzPreset('err', 0), throwsA(isA<HttpException>()));
-      expect(() => service.startPtzPatrol('err', 0), throwsA(isA<HttpException>()));
+      expect(() => service.moveToPtzPreset('err', 0),
+          throwsA(isA<HttpException>()));
+      expect(() => service.startPtzPatrol('err', 0),
+          throwsA(isA<HttpException>()));
       expect(() => service.stopPtzPatrol('err'), throwsA(isA<HttpException>()));
-      expect(() => service.disableMicrophone('err'), throwsA(isA<HttpException>()));
+      expect(() => service.disableMicrophone('err'),
+          throwsA(isA<HttpException>()));
     });
 
-    test('createTalkbackSession handles 200/201, non-map, and failures', () async {
+    test('createTalkbackSession handles 200/201, non-map, and failures',
+        () async {
       final MockClient mockClient = MockClient((http.Request request) async {
         if (request.url.path.contains('/cam_ok/talkback-session')) {
-          return http.Response(jsonEncode(<String, dynamic>{'sessionId': 'session_abc'}), 200);
+          return http.Response(
+              jsonEncode(<String, dynamic>{'sessionId': 'session_abc'}), 200);
         }
         if (request.url.path.contains('/cam_nonmap/talkback-session')) {
           return http.Response('[]', 200);
@@ -332,15 +368,19 @@ void main() {
         return http.Response('Error', 500);
       });
 
-      final CameraService service = CameraService(options: options, client: mockClient);
+      final CameraService service =
+          CameraService(options: options, client: mockClient);
 
-      final Map<String, dynamic> session = await service.createTalkbackSession('cam_ok');
+      final Map<String, dynamic> session =
+          await service.createTalkbackSession('cam_ok');
       expect(session['sessionId'], equals('session_abc'));
 
-      final Map<String, dynamic> nonMap = await service.createTalkbackSession('cam_nonmap');
+      final Map<String, dynamic> nonMap =
+          await service.createTalkbackSession('cam_nonmap');
       expect(nonMap, isEmpty);
 
-      expect(() => service.createTalkbackSession('err'), throwsA(isA<HttpException>()));
+      expect(() => service.createTalkbackSession('err'),
+          throwsA(isA<HttpException>()));
     });
 
     test('fetchAvailableStreamQualities and fetchOrCreateStreamUrl', () async {
@@ -449,9 +489,11 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final CameraService service = CameraService(options: options, client: mockClient);
+      final CameraService service =
+          CameraService(options: options, client: mockClient);
 
-      final Map<String, String> qualities = await service.fetchAvailableStreamQualities('cam_avail');
+      final Map<String, String> qualities =
+          await service.fetchAvailableStreamQualities('cam_avail');
       expect(qualities['high'], equals('rtsp://192.168.1.1:7447/AliasHigh'));
       expect(qualities['medium'], equals('rtsp://192.168.1.1:7447/AliasMed'));
       expect(qualities['low'], equals('rtsp://192.168.1.1:7447/AliasLow'));
@@ -461,7 +503,8 @@ void main() {
       final String? lowUrl = await service.fetchOrCreateStreamUrl('cam_avail');
       expect(lowUrl, equals('rtsp://192.168.1.1:7447/AliasLow'));
 
-      final String? pkgUrl = await service.fetchOrCreateStreamUrl('cam_avail_package');
+      final String? pkgUrl =
+          await service.fetchOrCreateStreamUrl('cam_avail_package');
       expect(pkgUrl, equals('rtsp://192.168.1.1:7447/AliasPkg'));
 
       // Inexact fallback to existing lower/higher quality in active streams
@@ -469,7 +512,8 @@ void main() {
         'cam_only_low',
         quality: StreamQuality.high,
       );
-      expect(fallbackFromActive, equals('rtsp://192.168.1.1:7447/OnlyLowAlias'));
+      expect(
+          fallbackFromActive, equals('rtsp://192.168.1.1:7447/OnlyLowAlias'));
 
       // Creation succeeds when stream not active
       final String? createdUrl = await service.fetchOrCreateStreamUrl(
@@ -485,13 +529,20 @@ void main() {
       expect(createdLowUrl, equals('rtsp://192.168.1.1:7447/CreatedLow'));
 
       // Not found & creation fails
-      final String? noneUrl = await service.fetchOrCreateStreamUrl('cam_none', exactMatchOnly: true);
+      final String? noneUrl = await service.fetchOrCreateStreamUrl('cam_none',
+          exactMatchOnly: true);
       expect(noneUrl, isNull);
     });
 
     test('extractStreamUrlFromResponse branches', () {
-      expect(CameraService.extractStreamUrlFromResponse('', nvrHost: '192.168.1.1'), isNull);
-      expect(CameraService.extractStreamUrlFromResponse('[]', nvrHost: '192.168.1.1'), isNull);
+      expect(
+          CameraService.extractStreamUrlFromResponse('',
+              nvrHost: '192.168.1.1'),
+          isNull);
+      expect(
+          CameraService.extractStreamUrlFromResponse('[]',
+              nvrHost: '192.168.1.1'),
+          isNull);
 
       const String jsonBody = '''
       {

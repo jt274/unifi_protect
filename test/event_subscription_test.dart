@@ -5,33 +5,37 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:unifi_protect/unifi_protect.dart';
 
+import 'test_certificates.dart';
+
 void main() {
   group('ProtectEventSubscription', () {
     late HttpServer mockWsServer;
     late int serverPort;
-    StreamController<String>? clientSocketController;
-    WebSocket? serverSocket;
+    late Completer<WebSocket> serverSocketCompleter;
 
     setUp(() async {
       mockWsServer = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
       serverPort = mockWsServer.port;
+      serverSocketCompleter = Completer<WebSocket>();
 
       mockWsServer.transform(WebSocketTransformer()).listen((WebSocket socket) {
-        serverSocket = socket;
+        socket.listen(
+          (dynamic data) {},
+          onError: (Object _) {},
+        );
         socket.done.catchError((Object _) {});
-        clientSocketController = StreamController<String>();
-        clientSocketController!.stream.listen((String msg) {
-          socket.add(msg);
-        });
+        if (!serverSocketCompleter.isCompleted) {
+          serverSocketCompleter.complete(socket);
+        }
       });
     });
 
     tearDown(() async {
-      await clientSocketController?.close();
       await mockWsServer.close(force: true);
     });
 
-    test('receives and parses alert and update events over WebSocket and handles connection state',
+    test(
+        'receives and parses alert and update events over WebSocket and handles connection state',
         () async {
       final UnifiProtectOptions options = UnifiProtectOptions(
         host: '127.0.0.1',
@@ -42,7 +46,7 @@ void main() {
 
       final ProtectEventSubscription subscription = ProtectEventSubscription(
         options: options,
-        reconnectInterval: const Duration(milliseconds: 100),
+        reconnectInterval: const Duration(milliseconds: 10),
       );
 
       final List<ProtectEvent> events = <ProtectEvent>[];
@@ -64,8 +68,10 @@ void main() {
       expect(connected, isTrue);
       expect(subscription.isConnected, isTrue);
 
+      final WebSocket serverSocket = await serverSocketCompleter.future;
+
       // 1. Send smart detection event with smartDetectTypes list fallback
-      clientSocketController?.add(
+      serverSocket.add(
         jsonEncode(<String, dynamic>{
           'item': <String, dynamic>{
             'camera': 'cam_driveway',
@@ -76,7 +82,7 @@ void main() {
       );
 
       // 2. Send smart detection with explicit type
-      clientSocketController?.add(
+      serverSocket.add(
         jsonEncode(<String, dynamic>{
           'item': <String, dynamic>{
             'camera': 'cam_porch',
@@ -88,7 +94,7 @@ void main() {
       );
 
       // 3. Send device update event
-      clientSocketController?.add(
+      serverSocket.add(
         jsonEncode(<String, dynamic>{
           'action': 'update',
           'item': <String, String>{
@@ -99,8 +105,8 @@ void main() {
       );
 
       // 4. Send non-json and non-map message (ignored without throwing)
-      clientSocketController?.add('not_json_string');
-      clientSocketController?.add('["array_not_map"]');
+      serverSocket.add('not_json_string');
+      serverSocket.add('["array_not_map"]');
 
       await eventsReceived.future.timeout(const Duration(seconds: 3));
 
@@ -114,13 +120,14 @@ void main() {
       expect(alert2.cameraId, equals('cam_porch'));
       expect(alert2.cameraName, equals('Porch Cam'));
 
-      final ProtectDeviceUpdateEvent update = events[2] as ProtectDeviceUpdateEvent;
+      final ProtectDeviceUpdateEvent update =
+          events[2] as ProtectDeviceUpdateEvent;
       expect(update.modelKey, equals('camera'));
       expect(update.deviceId, equals('cam_driveway'));
 
       // 5. Test server socket close triggering reconnect logic
-      await serverSocket?.close();
-      await Future<void>.delayed(const Duration(milliseconds: 150));
+      await serverSocket.close();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
       await connSub.cancel();
       await sub.cancel();
@@ -131,37 +138,16 @@ void main() {
     });
 
     test('connects securely to wss with self-signed certificate', () async {
-      final Directory tempDir =
-          Directory.systemTemp.createTempSync('wss_test_');
-      final String certPath = '${tempDir.path}/cert.pem';
-      final String keyPath = '${tempDir.path}/key.pem';
-      Process.runSync('openssl', <String>[
-        'req',
-        '-x509',
-        '-newkey',
-        'rsa:2048',
-        '-keyout',
-        keyPath,
-        '-out',
-        certPath,
-        '-days',
-        '1',
-        '-nodes',
-        '-subj',
-        '/CN=localhost',
-      ]);
-      final SecurityContext context = SecurityContext()
-        ..useCertificateChain(certPath)
-        ..usePrivateKey(keyPath);
+      final SecurityContext context = createTestSecurityContext();
       final HttpServer secureWsServer =
-          await HttpServer.bindSecure('localhost', 0, context);
+          await HttpServer.bindSecure(InternetAddress.loopbackIPv4, 0, context);
       secureWsServer.transform(WebSocketTransformer()).listen((WebSocket ws) {
         ws.add('{}');
       });
 
       try {
         final UnifiProtectOptions options = UnifiProtectOptions(
-          host: 'localhost',
+          host: '127.0.0.1',
           port: secureWsServer.port,
           apiKey: 'test-ws-key',
         );
@@ -172,16 +158,21 @@ void main() {
         await subscription.dispose();
       } finally {
         await secureWsServer.close(force: true);
-        tempDir.deleteSync(recursive: true);
       }
     });
 
     test('connect to invalid host returns false', () async {
-      const UnifiProtectOptions options = UnifiProtectOptions(
+      final ServerSocket temp =
+          await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+      final int closedPort = temp.port;
+      await temp.close();
+
+      final UnifiProtectOptions options = UnifiProtectOptions(
         host: '127.0.0.1',
-        port: 1, // Closed port
+        port: closedPort,
         apiKey: 'key',
         useSsl: false,
+        requestTimeout: const Duration(milliseconds: 500),
       );
       final ProtectEventSubscription subscription = ProtectEventSubscription(
         options: options,
