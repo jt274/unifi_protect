@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -140,7 +139,8 @@ void main() {
       });
       final CameraService errService =
           CameraService(options: options, client: errClient);
-      expect(() => errService.listCameras(), throwsA(isA<HttpException>()));
+      expect(
+          () => errService.listCameras(), throwsA(isA<ProtectHttpException>()));
     });
 
     test('getCamera returns single camera details or throws', () async {
@@ -170,8 +170,8 @@ void main() {
       expect(cam.name, equals('Backyard G5'));
       expect(cam.isOnline, isTrue);
 
-      expect(
-          () => service.getCamera('not_found'), throwsA(isA<HttpException>()));
+      expect(() => service.getCamera('not_found'),
+          throwsA(isA<ProtectHttpException>()));
       expect(() => service.getCamera('bad_format'),
           throwsA(isA<FormatException>()));
     });
@@ -221,7 +221,7 @@ void main() {
       expect(via204.name, equals('Fetched After 204'));
 
       expect(() => service.updateCamera('err', <String, dynamic>{}),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('getSnapshot returns raw image bytes or throws', () async {
@@ -241,7 +241,8 @@ void main() {
           channel: 'package', highQuality: true);
       expect(bytes, equals(mockBytes));
 
-      expect(() => service.getSnapshot('err'), throwsA(isA<HttpException>()));
+      expect(() => service.getSnapshot('err'),
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('getRtspsStreams and createRtspsStream handle stream URLs and errors',
@@ -289,7 +290,7 @@ void main() {
 
       expect(
         () => service.createRtspsStream('err'),
-        throwsA(isA<HttpException>()),
+        throwsA(isA<ProtectHttpException>()),
       );
       expect(await service.createRtspsStream('bad_json'), isEmpty);
     });
@@ -314,7 +315,7 @@ void main() {
       await service.deleteRtspsStream('cam_204');
       await service.deleteRtspsStream('cam_404');
       expect(() => service.deleteRtspsStream('cam_500'),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('PTZ controls execute POST requests correctly and handle failures',
@@ -347,12 +348,13 @@ void main() {
       );
 
       expect(() => service.moveToPtzPreset('err', 0),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
       expect(() => service.startPtzPatrol('err', 0),
-          throwsA(isA<HttpException>()));
-      expect(() => service.stopPtzPatrol('err'), throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
+      expect(() => service.stopPtzPatrol('err'),
+          throwsA(isA<ProtectHttpException>()));
       expect(() => service.disableMicrophone('err'),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('createTalkbackSession handles 200/201, non-map, and failures',
@@ -380,7 +382,7 @@ void main() {
       expect(nonMap, isEmpty);
 
       expect(() => service.createTalkbackSession('err'),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('fetchAvailableStreamQualities and fetchOrCreateStreamUrl', () async {

@@ -1,6 +1,7 @@
 # Changelog
 
-## 0.1.1 (2026-10-31)
+## 0.2.0 (2026-10-31)
+- Add full Web platform support.
 - Update docs.
 
 ## 0.1.0 (2026-10-31)

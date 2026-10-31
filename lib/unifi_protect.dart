@@ -13,6 +13,7 @@ export 'src/models/camera.dart';
 export 'src/models/channel.dart';
 export 'src/models/chime.dart';
 export 'src/models/detection_type.dart';
+export 'src/models/exception.dart';
 export 'src/models/light.dart';
 export 'src/models/liveview.dart';
 export 'src/models/meta_info.dart';

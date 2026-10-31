@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -7,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../client/unifi_protect_options.dart';
 import '../models/camera.dart';
 import '../models/channel.dart';
+import '../models/exception.dart';
 import '../models/stream_quality.dart';
 import '../utils/rtsp_sanitizer.dart';
 
@@ -31,8 +31,9 @@ class CameraService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for listCameras',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -61,8 +62,9 @@ class CameraService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for getCamera ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -96,8 +98,9 @@ class CameraService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for updateCamera ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -136,8 +139,9 @@ class CameraService {
     ).timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to capture snapshot from camera $id (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -211,8 +215,9 @@ class CameraService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to create RTSPS stream for $id (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -257,8 +262,9 @@ class CameraService {
     if (response.statusCode != 200 &&
         response.statusCode != 204 &&
         response.statusCode != 404) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to delete RTSPS stream for $id (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -276,8 +282,9 @@ class CameraService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to move PTZ camera $id to slot $slot (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -294,8 +301,9 @@ class CameraService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to start PTZ patrol on camera $id (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -312,8 +320,9 @@ class CameraService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to stop PTZ patrol on camera $id (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -330,8 +339,9 @@ class CameraService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to disable microphone on camera $id (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -348,8 +358,9 @@ class CameraService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to start talkback session for camera $id (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }

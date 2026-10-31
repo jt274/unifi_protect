@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -131,15 +130,16 @@ void main() {
         options: const UnifiProtectOptions(apiKey: 'k', host: 'err'),
         client: mockClient,
       );
-      expect(() => errService.listLiveviews(), throwsA(isA<HttpException>()));
-      expect(
-          () => errService.getLiveview('err'), throwsA(isA<HttpException>()));
+      expect(() => errService.listLiveviews(),
+          throwsA(isA<ProtectHttpException>()));
+      expect(() => errService.getLiveview('err'),
+          throwsA(isA<ProtectHttpException>()));
       expect(() => errService.createLiveview(<String, dynamic>{}),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
       expect(() => errService.updateLiveview('err', <String, dynamic>{}),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
       expect(() => errService.deleteLiveview('err'),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
     });
 
     test('listLiveviews handles data envelope and empty map', () async {
@@ -301,10 +301,10 @@ void main() {
         options: const UnifiProtectOptions(apiKey: 'k', host: 'err'),
         client: mockClient,
       );
-      expect(errService.getMetaInfo(), throwsA(isA<HttpException>()));
-      expect(errService.getNvr(), throwsA(isA<HttpException>()));
+      expect(errService.getMetaInfo(), throwsA(isA<ProtectHttpException>()));
+      expect(errService.getNvr(), throwsA(isA<ProtectHttpException>()));
       expect(errService.updateNvr(<String, dynamic>{}),
-          throwsA(isA<HttpException>()));
+          throwsA(isA<ProtectHttpException>()));
     });
   });
 
@@ -345,7 +345,7 @@ void main() {
       simulatedStatus = 400;
       expect(
         () => service.triggerAlarmWebhook('test_webhook_id'),
-        throwsA(isA<HttpException>()),
+        throwsA(isA<ProtectHttpException>()),
       );
 
       final AlarmManagerService errService = AlarmManagerService(
@@ -354,7 +354,7 @@ void main() {
       );
       expect(
         () => errService.triggerAlarmWebhook('err'),
-        throwsA(isA<HttpException>()),
+        throwsA(isA<ProtectHttpException>()),
       );
     });
   });

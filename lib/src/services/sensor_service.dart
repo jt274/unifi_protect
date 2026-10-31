@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
 import '../client/unifi_protect_options.dart';
+import '../models/exception.dart';
 import '../models/sensor.dart';
 
 /// Service for monitoring and configuring UniFi Protect multi-sensors.
@@ -27,8 +27,9 @@ class SensorService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for listSensors',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -57,8 +58,9 @@ class SensorService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for getSensor ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
@@ -86,8 +88,9 @@ class SensorService {
         .timeout(options.requestTimeout);
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'UniFi Protect returned HTTP ${response.statusCode} for updateSensor ($id)',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }

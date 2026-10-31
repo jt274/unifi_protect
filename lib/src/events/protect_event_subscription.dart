@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../client/unifi_protect_options.dart';
 import '../models/detection_type.dart';
+import 'event_channel_adapter.dart';
 import 'protect_event.dart';
 
 /// Real-time event streaming subscription via UniFi Protect WebSocket.
@@ -14,10 +13,15 @@ class ProtectEventSubscription {
   ProtectEventSubscription({
     required this.options,
     this.reconnectInterval = const Duration(seconds: 10),
+    this.channelFactory,
   });
 
   final UnifiProtectOptions options;
   final Duration reconnectInterval;
+
+  /// Optional factory function for creating the underlying [WebSocketChannel].
+  final Future<WebSocketChannel> Function(UnifiProtectOptions options)?
+      channelFactory;
 
   final StreamController<ProtectEvent> _eventController =
       StreamController<ProtectEvent>.broadcast();
@@ -48,22 +52,9 @@ class ProtectEventSubscription {
     await _closeChannel();
 
     try {
-      final Uri wsUri = options.eventsWebSocketUri;
-      final HttpClient customClient = HttpClient();
-      if (options.allowSelfSignedCertificates) {
-        customClient.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
-      }
-
-      final WebSocket socket = await WebSocket.connect(
-        wsUri.toString(),
-        headers: <String, dynamic>{
-          'X-API-KEY': options.apiKey.trim(),
-        },
-        customClient: customClient,
-      ).timeout(options.requestTimeout);
-
-      _channel = IOWebSocketChannel(socket);
+      final Future<WebSocketChannel> Function(UnifiProtectOptions options)
+          connectFn = channelFactory ?? connectEventChannel;
+      _channel = await connectFn(options);
       _setConnected(true);
 
       void onDisconnected([Object? _]) {

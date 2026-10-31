@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
 import '../client/unifi_protect_options.dart';
+import '../models/exception.dart';
 
 /// Service for interacting with UniFi Protect Alarm Manager webhooks.
 class AlarmManagerService {
@@ -38,8 +38,9 @@ class AlarmManagerService {
     if (response.statusCode != 200 &&
         response.statusCode != 201 &&
         response.statusCode != 204) {
-      throw HttpException(
+      throw ProtectHttpException(
         'Failed to trigger Alarm Manager webhook $webhookId (HTTP ${response.statusCode})',
+        statusCode: response.statusCode,
         uri: uri,
       );
     }
