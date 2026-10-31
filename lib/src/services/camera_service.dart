@@ -396,6 +396,68 @@ class CameraService {
     return result;
   }
 
+  /// Extracts the stream URL from a UniFi Protect `/rtsps-stream` JSON response,
+  /// respecting the specified [qualityPreference] or [isPackageCamera], rewrites
+  /// the host to [nvrHost], and sanitizes it.
+  /// When [exactMatchOnly] is true, only searches for the requested quality.
+  static String? extractStreamUrlFromResponse(
+    String responseBody, {
+    required String nvrHost,
+    StreamQuality qualityPreference = StreamQuality.low,
+    bool isPackageCamera = false,
+    bool exactMatchOnly = false,
+  }) {
+    if (responseBody.trim().isEmpty) {
+      return null;
+    }
+    try {
+      final dynamic decoded = jsonDecode(responseBody);
+      if (decoded is! Map<String, dynamic>) {
+        return null;
+      }
+
+      final List<String> searchKeys;
+      if (isPackageCamera) {
+        searchKeys = exactMatchOnly
+            ? const <String>['package']
+            : const <String>['package', 'low', 'medium', 'high'];
+      } else if (exactMatchOnly) {
+        searchKeys = <String>[qualityPreference.name.toLowerCase()];
+      } else {
+        switch (qualityPreference) {
+          case StreamQuality.low:
+            searchKeys = const <String>['low', 'medium', 'high'];
+          case StreamQuality.medium:
+            searchKeys = const <String>['medium', 'high', 'low'];
+          case StreamQuality.high:
+          case StreamQuality.package:
+            searchKeys = const <String>['high', 'medium', 'low'];
+        }
+      }
+
+      for (final String key in searchKeys) {
+        final dynamic rawVal = decoded[key];
+        if (rawVal is String && rawVal.trim().isNotEmpty) {
+          final Uri? parsed = Uri.tryParse(rawVal.trim());
+          if (parsed != null && parsed.pathSegments.isNotEmpty) {
+            final String rewritten = Uri(
+              scheme: parsed.scheme.isNotEmpty ? parsed.scheme : 'rtsps',
+              userInfo: parsed.userInfo.isNotEmpty ? parsed.userInfo : null,
+              host: nvrHost,
+              port: parsed.port != 0 ? parsed.port : 7441,
+              path: parsed.path,
+              queryParameters: parsed.queryParameters.isEmpty
+                  ? null
+                  : parsed.queryParameters,
+            ).toString();
+            return RtspSanitizer.sanitize(rewritten);
+          }
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
   /// Fetches an existing RTSP/RTSPS stream URL or creates one on-demand.
   Future<String?> fetchOrCreateStreamUrl(
     String id, {
