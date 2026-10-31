@@ -17,7 +17,7 @@ void main() {
       expect(opts.port, equals(443));
       expect(opts.apiKey, equals('key123'));
       expect(opts.cloudConsoleId, isNull);
-      expect(opts.allowSelfSignedCertificates, isTrue);
+      expect(opts.allowSelfSignedCertificates, isFalse);
       expect(opts.useSsl, isTrue);
       expect(opts.isCloudMode, isFalse);
       expect(
@@ -83,6 +83,7 @@ void main() {
     test('createHttpClient respects allowSelfSignedCertificates flag', () {
       const UnifiProtectOptions optsAllow = UnifiProtectOptions(
         apiKey: 'key',
+        allowSelfSignedCertificates: true,
       );
       final http.Client clientAllow = createHttpClient(optsAllow);
       expect(clientAllow, isNotNull);
@@ -90,11 +91,19 @@ void main() {
 
       const UnifiProtectOptions optsDisallow = UnifiProtectOptions(
         apiKey: 'key',
-        allowSelfSignedCertificates: false,
       );
       final http.Client clientDisallow = createHttpClient(optsDisallow);
       expect(clientDisallow, isNotNull);
       clientDisallow.close();
+
+      const UnifiProtectOptions optsCloud = UnifiProtectOptions(
+        apiKey: 'key',
+        cloudConsoleId: 'cloud-id',
+        allowSelfSignedCertificates: true,
+      );
+      final http.Client clientCloud = createHttpClient(optsCloud);
+      expect(clientCloud, isNotNull);
+      clientCloud.close();
     });
 
     test(
@@ -114,6 +123,7 @@ void main() {
           host: '127.0.0.1',
           port: port,
           apiKey: 'key',
+          allowSelfSignedCertificates: true,
         );
         final http.Client clientMatching = createHttpClient(optsMatching);
         final http.Response resMatching =
@@ -125,11 +135,13 @@ void main() {
           host: 'otherhost',
           port: port,
           apiKey: 'key',
+          allowSelfSignedCertificates: true,
         );
         final http.Client clientMismatch = createHttpClient(optsMismatch);
-        final http.Response resMismatch =
-            await clientMismatch.get(Uri.parse('https://127.0.0.1:$port/'));
-        expect(resMismatch.body, equals('secure ok'));
+        expect(
+          () => clientMismatch.get(Uri.parse('https://127.0.0.1:$port/')),
+          throwsA(isA<http.ClientException>()),
+        );
         clientMismatch.close();
       } finally {
         await secureServer.close(force: true);

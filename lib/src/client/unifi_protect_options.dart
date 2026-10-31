@@ -5,7 +5,7 @@ class UnifiProtectOptions {
     this.port = 443,
     required this.apiKey,
     this.cloudConsoleId,
-    this.allowSelfSignedCertificates = true,
+    this.allowSelfSignedCertificates = false,
     this.useSsl = true,
     this.requestTimeout = const Duration(seconds: 10),
   });
@@ -23,6 +23,10 @@ class UnifiProtectOptions {
   final String? cloudConsoleId;
 
   /// Whether to permit self-signed SSL certificates when connecting directly to local consoles.
+  ///
+  /// Defaults to `false` for security. Set to `true` when connecting to local
+  /// UniFi OS consoles that use the factory self-signed SSL certificate.
+  /// This option is ignored when [isCloudMode] is true (`api.ui.com`).
   final bool allowSelfSignedCertificates;
 
   /// Whether to use HTTPS/WSS (true) or HTTP/WS (false).

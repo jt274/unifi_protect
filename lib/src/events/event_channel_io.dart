@@ -10,9 +10,13 @@ Future<WebSocketChannel> connectEventChannel(
     UnifiProtectOptions options) async {
   final Uri wsUri = options.eventsWebSocketUri;
   final HttpClient customClient = HttpClient();
-  if (options.allowSelfSignedCertificates) {
+  if (options.allowSelfSignedCertificates && !options.isCloudMode) {
     customClient.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
+        (X509Certificate cert, String host, int port) {
+      final String normalizedHost = host.toLowerCase().trim();
+      final String targetHost = options.cleanHost.toLowerCase().trim();
+      return normalizedHost == targetHost;
+    };
   }
 
   final WebSocket socket = await WebSocket.connect(

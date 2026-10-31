@@ -7,7 +7,7 @@ import 'unifi_protect_options.dart';
 
 /// Creates an [http.Client] that respects [UnifiProtectOptions.allowSelfSignedCertificates].
 http.Client createHttpClient(UnifiProtectOptions options) {
-  if (!options.allowSelfSignedCertificates) {
+  if (!options.allowSelfSignedCertificates || options.isCloudMode) {
     return http.Client();
   }
 
@@ -15,8 +15,7 @@ http.Client createHttpClient(UnifiProtectOptions options) {
     ..badCertificateCallback = (X509Certificate cert, String host, int port) {
       final String normalizedHost = host.toLowerCase().trim();
       final String targetHost = options.cleanHost.toLowerCase().trim();
-      return normalizedHost == targetHost ||
-          options.allowSelfSignedCertificates;
+      return normalizedHost == targetHost;
     };
 
   return IOClient(innerIoClient);
