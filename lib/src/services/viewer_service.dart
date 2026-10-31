@@ -8,12 +8,16 @@ import '../models/viewer.dart';
 
 /// Service for managing UniFi Protect ViewPort HDMI display devices.
 class ViewerService {
+  /// Creates a [ViewerService] with the given [options] and HTTP [client].
   ViewerService({
     required this.options,
     required this.client,
   });
 
+  /// The active UniFi Protect client connection options.
   final UnifiProtectOptions options;
+
+  /// The HTTP client used to perform API requests.
   final http.Client client;
 
   /// Lists all adopted ViewPort devices.

@@ -8,12 +8,16 @@ import '../models/liveview.dart';
 
 /// Service for managing UniFi Protect multi-camera live view layouts.
 class LiveviewService {
+  /// Creates a [LiveviewService] with the given [options] and HTTP [client].
   LiveviewService({
     required this.options,
     required this.client,
   });
 
+  /// The active UniFi Protect client connection options.
   final UnifiProtectOptions options;
+
+  /// The HTTP client used to perform API requests.
   final http.Client client;
 
   /// Lists all configured live view layouts.

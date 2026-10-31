@@ -8,12 +8,16 @@ import '../models/exception.dart';
 
 /// Service for managing UniFi Protect smart chimes.
 class ChimeService {
+  /// Creates a [ChimeService] with the given [options] and HTTP [client].
   ChimeService({
     required this.options,
     required this.client,
   });
 
+  /// The active UniFi Protect client connection options.
   final UnifiProtectOptions options;
+
+  /// The HTTP client used to perform API requests.
   final http.Client client;
 
   /// Lists all adopted smart chimes.

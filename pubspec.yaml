@@ -1,6 +1,6 @@
 name: unifi_protect
 description: "Pure Dart client for the Ubiquiti UniFi Protect Integration API (v1)."
-version: 0.2.0
+version: 0.2.1
 homepage: https://github.com/jt274/unifi_protect
 repository: https://github.com/jt274/unifi_protect
 issue_tracker: https://github.com/jt274/unifi_protect/issues

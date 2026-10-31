@@ -1,5 +1,6 @@
 /// Represents a UniFi Protect multi-sensor device.
 class ProtectSensor {
+  /// Creates a [ProtectSensor] instance.
   const ProtectSensor({
     required this.id,
     required this.name,
@@ -15,6 +16,7 @@ class ProtectSensor {
     this.rawJson = const <String, dynamic>{},
   });
 
+  /// Deserializes a [ProtectSensor] from JSON returned by the Protect API.
   factory ProtectSensor.fromJson(Map<String, dynamic> json) {
     final String? stateStr = json['state']?.toString().toUpperCase();
     final bool isOnline = stateStr == null || stateStr == 'CONNECTED';
@@ -63,19 +65,43 @@ class ProtectSensor {
     );
   }
 
+  /// Unique identifier of the sensor.
   final String id;
+
+  /// User-configured display name.
   final String name;
+
+  /// Hardware device model type.
   final String type;
+
+  /// Whether the sensor is currently connected and online.
   final bool isOnline;
+
+  /// Remaining battery percentage (0-100), if battery-operated.
   final int? batteryPercentage;
+
+  /// Whether motion is currently detected by the sensor.
   final bool isMotionDetected;
+
+  /// Whether the door/window contact sensor is currently open.
   final bool isOpen;
+
+  /// Ambient temperature reading in degrees Celsius.
   final double? temperature;
+
+  /// Relative humidity percentage reading (0-100).
   final double? humidity;
+
+  /// Ambient light level reading in lux.
   final double? lightLevel;
+
+  /// Whether an audio smoke/CO alarm was detected.
   final bool isAlarmDetected;
+
+  /// Raw JSON payload from the API.
   final Map<String, dynamic> rawJson;
 
+  /// Converts this sensor instance into a JSON-serializable map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

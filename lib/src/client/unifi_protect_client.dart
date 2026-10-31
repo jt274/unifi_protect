@@ -15,6 +15,9 @@ import 'unifi_protect_options.dart';
 
 /// The primary client for interacting with the Ubiquiti UniFi Protect Integration API.
 class UnifiProtectClient {
+  /// Creates a [UnifiProtectClient] instance configured with [options].
+  ///
+  /// Optionally accepts a custom [httpClient] implementation.
   UnifiProtectClient({
     required this.options,
     http.Client? httpClient,

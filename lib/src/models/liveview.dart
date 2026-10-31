@@ -1,11 +1,13 @@
 /// Represents an individual slot in a multi-camera live view layout.
 class LiveviewSlot {
+  /// Creates a [LiveviewSlot] with assigned [cameraIds].
   const LiveviewSlot({
     required this.cameraIds,
     this.cycleMode = 'none',
     this.cycleInterval = 10,
   });
 
+  /// Deserializes a [LiveviewSlot] from JSON data.
   factory LiveviewSlot.fromJson(Map<String, dynamic> json) {
     final dynamic rawCameras = json['cameras'] ?? json['cameraIds'];
     final List<String> cameraIds = <String>[];
@@ -35,6 +37,7 @@ class LiveviewSlot {
   /// Time in seconds before cycling to the next camera if in interval mode.
   final int cycleInterval;
 
+  /// Converts this slot into a JSON-serializable map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'cameras': cameraIds,
@@ -46,6 +49,7 @@ class LiveviewSlot {
 
 /// Represents a UniFi Protect multi-camera live view grid layout.
 class ProtectLiveview {
+  /// Creates a [ProtectLiveview] layout.
   const ProtectLiveview({
     required this.id,
     required this.name,
@@ -55,6 +59,7 @@ class ProtectLiveview {
     this.rawJson = const <String, dynamic>{},
   });
 
+  /// Deserializes a [ProtectLiveview] from JSON returned by the Protect API.
   factory ProtectLiveview.fromJson(Map<String, dynamic> json) {
     final dynamic rawSlots = json['slots'];
     final List<LiveviewSlot> slots = <LiveviewSlot>[];
@@ -76,13 +81,25 @@ class ProtectLiveview {
     );
   }
 
+  /// Unique identifier of the live view layout.
   final String id;
+
+  /// User-defined display name.
   final String name;
+
+  /// Whether this layout is the system default.
   final bool isDefault;
+
+  /// Whether this layout is available globally across all users.
   final bool isGlobal;
+
+  /// List of camera slots in the layout matrix.
   final List<LiveviewSlot> slots;
+
+  /// Raw JSON payload from the API.
   final Map<String, dynamic> rawJson;
 
+  /// Converts this live view layout into a JSON-serializable map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

@@ -8,12 +8,16 @@ import '../models/sensor.dart';
 
 /// Service for monitoring and configuring UniFi Protect multi-sensors.
 class SensorService {
+  /// Creates a [SensorService] with the given [options] and HTTP [client].
   SensorService({
     required this.options,
     required this.client,
   });
 
+  /// The active UniFi Protect client connection options.
   final UnifiProtectOptions options;
+
+  /// The HTTP client used to perform API requests.
   final http.Client client;
 
   /// Lists all adopted smart sensors.

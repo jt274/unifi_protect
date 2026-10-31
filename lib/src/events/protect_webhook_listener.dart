@@ -7,6 +7,7 @@ import 'webhook_server_adapter.dart';
 
 /// Embedded local HTTP server for receiving UniFi Protect Alarm Manager webhooks.
 class ProtectWebhookListener {
+  /// Creates a [ProtectWebhookListener] with an optional custom [serverAdapter].
   ProtectWebhookListener({WebhookServerAdapter? serverAdapter})
       : _adapter = serverAdapter ?? createWebhookServer();
 

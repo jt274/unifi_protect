@@ -1,5 +1,6 @@
 /// Represents a UniFi Protect smart floodlight.
 class ProtectLight {
+  /// Creates a [ProtectLight] instance.
   const ProtectLight({
     required this.id,
     required this.name,
@@ -11,6 +12,7 @@ class ProtectLight {
     this.rawJson = const <String, dynamic>{},
   });
 
+  /// Deserializes a [ProtectLight] from JSON returned by the Protect API.
   factory ProtectLight.fromJson(Map<String, dynamic> json) {
     final String? stateStr = json['state']?.toString().toUpperCase();
     final bool isOnline = stateStr == null || stateStr == 'CONNECTED';
@@ -31,15 +33,31 @@ class ProtectLight {
     );
   }
 
+  /// Unique identifier of the floodlight.
   final String id;
+
+  /// User-configured display name.
   final String name;
+
+  /// Hardware device model type.
   final String type;
+
+  /// Whether the light is connected and online.
   final bool isOnline;
+
+  /// Whether the floodlight LED is currently turned on.
   final bool isLedOn;
+
+  /// LED brightness percentage (1-100).
   final int brightness;
+
+  /// Whether PIR motion is currently detected by the light's motion sensor.
   final bool isPirMotionDetected;
+
+  /// Raw JSON payload from the API.
   final Map<String, dynamic> rawJson;
 
+  /// Converts this floodlight instance into a JSON-serializable map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

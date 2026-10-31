@@ -1,5 +1,6 @@
 /// Represents a UniFi Protect smart chime.
 class ProtectChime {
+  /// Creates a [ProtectChime] instance.
   const ProtectChime({
     required this.id,
     required this.name,
@@ -11,6 +12,7 @@ class ProtectChime {
     this.rawJson = const <String, dynamic>{},
   });
 
+  /// Deserializes a [ProtectChime] from JSON returned by the Protect API.
   factory ProtectChime.fromJson(Map<String, dynamic> json) {
     final String? stateStr = json['state']?.toString().toUpperCase();
     final bool isOnline = stateStr == null || stateStr == 'CONNECTED';
@@ -48,15 +50,31 @@ class ProtectChime {
     );
   }
 
+  /// Unique identifier of the chime.
   final String id;
+
+  /// User-configured display name.
   final String name;
+
+  /// Hardware device type or model.
   final String type;
+
+  /// Whether the chime is currently connected and online.
   final bool isOnline;
+
+  /// Audio volume level percentage (0-100).
   final int volume;
+
+  /// List of camera IDs paired to ring this chime.
   final List<String> cameraIds;
+
+  /// Ring and buzzer configuration parameters.
   final Map<String, dynamic> ringSettings;
+
+  /// Raw JSON payload from the API.
   final Map<String, dynamic> rawJson;
 
+  /// Converts this chime instance into a JSON-serializable map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

@@ -9,12 +9,16 @@ import '../models/nvr.dart';
 
 /// Service for retrieving UniFi Protect application metadata and NVR system details.
 class NvrService {
+  /// Creates an [NvrService] with the given [options] and HTTP [client].
   NvrService({
     required this.options,
     required this.client,
   });
 
+  /// The active UniFi Protect client connection options.
   final UnifiProtectOptions options;
+
+  /// The HTTP client used to perform API requests.
   final http.Client client;
 
   /// Retrieves Protect application metadata, versions, and build info.

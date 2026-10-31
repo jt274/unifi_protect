@@ -1,5 +1,6 @@
 /// Exception thrown when a UniFi Protect HTTP request fails.
 class ProtectHttpException implements Exception {
+  /// Creates a [ProtectHttpException] with [message], optional [statusCode], and [uri].
   const ProtectHttpException(
     this.message, {
     this.statusCode,

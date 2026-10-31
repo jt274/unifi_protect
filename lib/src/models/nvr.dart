@@ -1,5 +1,6 @@
 /// Represents a UniFi Protect Network Video Recorder (NVR) host console.
 class ProtectNvr {
+  /// Creates a [ProtectNvr] console instance.
   const ProtectNvr({
     required this.id,
     required this.name,
@@ -14,6 +15,7 @@ class ProtectNvr {
     this.rawJson = const <String, dynamic>{},
   });
 
+  /// Deserializes a [ProtectNvr] from JSON returned by the Protect API.
   factory ProtectNvr.fromJson(Map<String, dynamic> json) {
     final Map<String, dynamic> storageInfo =
         json['storageInfo'] is Map<String, dynamic>
@@ -36,18 +38,40 @@ class ProtectNvr {
     );
   }
 
+  /// Unique identifier of the NVR.
   final String id;
+
+  /// System hostname or friendly name.
   final String name;
+
+  /// UniFi Protect application version.
   final String version;
+
+  /// UniFi OS firmware version, if available.
   final String? firmwareVersion;
+
+  /// Uptime in milliseconds.
   final int? uptimeMs;
+
+  /// Total storage capacity across disks in bytes.
   final int? storageTotalBytes;
+
+  /// Used storage space in bytes.
   final int? storageUsedBytes;
+
+  /// Free storage space available for recording in bytes.
   final int? storageAvailableBytes;
+
+  /// Whether video recording is globally active.
   final bool isRecording;
+
+  /// Total count of adopted cameras.
   final int cameraCount;
+
+  /// Raw JSON payload from the API.
   final Map<String, dynamic> rawJson;
 
+  /// Converts this NVR instance into a JSON-serializable map.
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'id': id,

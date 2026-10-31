@@ -7,6 +7,7 @@
 class RtspSanitizer {
   const RtspSanitizer._();
 
+  /// Singleton instance of [RtspSanitizer].
   static const RtspSanitizer instance = RtspSanitizer._();
 
   /// Converts a UniFi `rtsps://...:7441/...?enableSrtp` URL to `rtsp://...:7447/...`

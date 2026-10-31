@@ -1,10 +1,13 @@
 # Changelog
 
-## 0.2.0 (2026-10-31)
+## [0.2.1] - 2026-10-31
+- Add API docs.
+
+## [0.2.0] - 2026-10-31
 - Add full Web platform support.
 - Update docs.
 
-## 0.1.0 (2026-10-31)
+## [0.1.0] - 2026-10-31
 - Initial release of `unifi_protect`.
 - Full official API feature parity for Ubiquiti UniFi Protect Integration API v1 (`developer.ui.com/protect`).
 - Support for Cameras, Lights, Sensors, Chimes, Viewers, Live Views, NVR, Alarm Manager, Webhooks, and WebSockets.
